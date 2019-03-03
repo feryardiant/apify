@@ -45,7 +45,6 @@ async function fetchData (method, url) {
     }
 
     const [table, id, relation] = repo.paths
-    console.log(table, id, relation)
 
     if (!table) {
       result.data = repo.data
@@ -91,7 +90,7 @@ function connect (database) {
     return Promise.resolve(connections[database])
   }
 
-  const pathname = path.join(__dirname, '..', database)
+  const pathname = path.join(__dirname, database)
 
   return new Promise((resolve, reject) => {
     orm.connect({ pathname, protocol: 'sqlite' }, (err, db) => {
