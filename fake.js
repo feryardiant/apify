@@ -82,7 +82,7 @@ for (let i = 1; i <= 60; i++) {
   })
 }
 
-for (let i = 1; i <= 300; i++) {
+for (let i = 1; i <= 100; i++) {
   created = faker.date.past()
   faked.posts.push({
     id: i,
@@ -96,7 +96,7 @@ for (let i = 1; i <= 300; i++) {
   })
 }
 
-for (let i = 1; i <= 300; i++) {
+for (let i = 1; i <= 100; i++) {
   created = faker.date.past()
   faked.products.push({
     id: i,

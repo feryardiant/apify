@@ -4,7 +4,8 @@
   "description": "Mock API Server",
   "main": "index.js",
   "scripts": {
-    "serve": "nodemon index.js",
+    "start": "micro",
+    "serve": "micro-dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -22,6 +23,6 @@
   },
   "devDependencies": {
     "faker": "^4.1.0",
-    "nodemon": "^1.18.10"
+    "micro-dev": "^3.0.0"
   }
 }

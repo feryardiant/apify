@@ -1,9 +1,12 @@
 {
+  "name": "apify",
+  "alias": ["apify"],
   "version": 2,
   "builds": [
-    { "src": "trynow.js", "use": "now-micro" }
+    { "src": "index.js", "use": "now-micro" }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "/trynow.js" }
+    { "src": "/favicon.ico", "status": 404 },
+    { "src": "/(.*)", "dest": "/index.js" }
   ]
 }
