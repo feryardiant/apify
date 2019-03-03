@@ -1,5 +1,5 @@
 {
-  "name": "mockapi",
+  "name": "apify",
   "version": "0.0.1",
   "description": "Mock API Server",
   "main": "index.js",
@@ -16,7 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0",
-    "express": "^4.16.4",
+    "micro": "^9.3.3",
     "orm": "^5.0.4",
     "sqlite3": "^4.0.6"
   },
