@@ -1,0 +1,35 @@
+# Generic
+# --------------------------
+Thumbs.db
+Desktop.ini
+Icon?
+.directory
+*.cache
+*.old
+*.log
+*.db
+._
+*~
+
+# IDE Project Configurations
+# --------------------------
+/.idea
+/.settings
+/.vscode
+.project
+*.sublime-*
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+
+# Developments
+# --------------------------
+# /coverage
+/node_modules
+.env
+
+# But Keep these
+# --------------------------
+!.gitkeep
