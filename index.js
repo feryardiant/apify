@@ -1,8 +1,6 @@
-const { send } = require('micro')
+const { send, json } = require('micro')
 const orm = require('orm')
 const axios = require('axios')
-const { tmpdir } = require('os')
-const { join } = require('path')
 const { openSync, closeSync } = require('fs')
 
 const connections = {}
@@ -22,8 +20,8 @@ module.exports = async (req, res) => {
     })
   }
 
-  const [user, repo, table, key, relation] = paths
-  let db, conn, models
+  const [user, repo, table, ...segments] = paths
+  let db, status, data, input = {}
 
   try {
     db = await getDatabase(user, repo)
@@ -34,24 +32,91 @@ module.exports = async (req, res) => {
     })
   }
 
-  conn = await connect(db.name)
-  models = migrations[db.name]
-    ? migrations[db.name]
-    : await migrate(conn, db.definition)
+  const conn = await connect(db.name)
 
-  if (!table || !models) {
-    return db
+  if (!migrations[db.name]) {
+    migrations[db.name] = await migrate(conn, db.definition)
   }
 
-  const data = await promisify(done => {
-    if (key) {
-      models[table].get(key, done)
-    } else {
-      models[table].find(done)
-    }
-  })
+  const models = migrations[db.name]
 
-  return send(res, 200, { data })
+  if (!table || !models) {
+    console.log(models)
+    return []
+  }
+
+  status = 200
+  const method = req.method.toLowerCase()
+  if (['post', 'put'].includes(method)) {
+    input = await getInput(req)
+  }
+
+  try {
+    if (!models[table]) {
+      status = 404
+      throw new Error('Not found')
+    }
+
+    data = await promisify(done => {
+      if (method === 'get' && segments.length === 0) {
+        models[table].find(done)
+      } else if (method === 'post' && segments.length === 0) {
+        models[table].create(input, done)
+      } else if (method === 'get' && segments.length === 1) {
+        models[table].get(segments[0], done)
+      } else if (method === 'put' && segments.length === 1) {
+        models[table].get(segments[0], (err, model) => {
+          if (err) return done(err)
+
+          for (let field of Object.keys(input)) {
+            if (model[field] === input[field] || !input[field]) continue
+
+            model[field] = input[field]
+          }
+
+          model.save(done)
+        })
+      } else if (method === 'delete' && segments.length === 1) {
+        models[table].get(segments[0], (err, model) => {
+          if (err) return done(err)
+
+          model.remove(done)
+        })
+      } else {
+        done(new Error('Unsupported method'))
+      }
+    })
+  } catch (err) {
+    console.err(err)
+    data = null
+  }
+
+  return send(res, status, { data })
+}
+
+function getInput (req) {
+  const chunks = []
+  const type = req.headers['content-type']
+
+  return promisify(done => {
+    req.on('error', (err) => {
+      done(err)
+    })
+
+    req.on('data', (chunk) => {
+      chunks.push(chunk)
+    })
+
+    req.on('end', () => {
+      let body = Buffer.concat(chunks).toString()
+
+      if (type === 'application/x-www-form-urlencoded') {
+        body = require('querystring').parse(body)
+      }
+
+      done(null, body)
+    })
+  })
 }
 
 /**
@@ -60,6 +125,9 @@ module.exports = async (req, res) => {
  */
 async function connect (database) {
   if (!connections[database]) {
+    const { tmpdir } = require('os')
+    const { join } = require('path')
+
     database = join(tmpdir(), database)
     closeSync(openSync(database, 'a+'))
 
@@ -120,12 +188,11 @@ async function migrate (db, data) {
 
   try {
     await promisify(done => {
-      db.drop(done)
+      db.sync(done)
     })
 
-
     await promisify(done => {
-      db.sync(done)
+      db.drop(done)
     })
 
     for (const table of tables) {
