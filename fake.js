@@ -19,8 +19,9 @@ for (let i = 1; i <= 50; i++) {
   faked.users.push({
     id: i,
     username: faker.internet.userName(),
-    email: faker.internet.exampleEmail(),
+    email: faker.internet.exampleEmail().toLowerCase(),
     avatar: faker.internet.avatar(),
+    deleted_at: null,
     created_at: created,
     active_at: created,
     updated_at: faker.date.between(created, now),
@@ -34,23 +35,21 @@ for (let i = 1; i <= 100; i++) {
   const updated = faker.date.between(created, now)
   const tag = faker.random.arrayElement(albumTags)
   const images = []
-  const length = [15, 20, 25, 30, 35, 40]
+  const length = [6, 9, 12, 15]
 
   for (let n = 1; n <= faker.random.arrayElement(length); n++) {
     images.push({
-      album_id: i,
-      image: faker.image[tag](),
-      tag: tag,
-      created_at: updated,
-      updated_at: updated
+      image: faker.image[tag]()
     })
   }
 
   faked.albums.push({
     id: i,
     user_id: faker.random.arrayElement(users),
+    thumbnail: faker.image[tag](400, 400),
     images: images,
     tag: tag,
+    deleted_at: null,
     created_at: created,
     updated_at: updated,
   })
@@ -62,8 +61,8 @@ for (let i = 1; i <= 20; i++) {
   companies.push({
     name: faker.company.companyName(),
     address: faker.address.streetAddress(),
-    phone: faker.phone.phoneNumber(),
-    email: faker.internet.exampleEmail()
+    phone: faker.phone.phoneNumber('(###) ###-####'),
+    email: faker.internet.exampleEmail().toLowerCase()
   })
 }
 
@@ -74,9 +73,10 @@ for (let i = 1; i <= 60; i++) {
     user_id: faker.random.arrayElement(users),
     name: faker.name.findName(),
     address: faker.address.streetAddress(),
-    phone: faker.phone.phoneNumber(),
-    email: faker.internet.exampleEmail(),
+    phone: faker.phone.phoneNumber('(###) ###-####'),
+    email: faker.internet.exampleEmail().toLowerCase(),
     company: faker.random.arrayElement(companies),
+    deleted_at: null,
     created_at: created,
     updated_at: faker.date.between(created, now),
   })
@@ -84,13 +84,15 @@ for (let i = 1; i <= 60; i++) {
 
 for (let i = 1; i <= 100; i++) {
   created = faker.date.past()
+  const title = faker.lorem.words(6)
   faked.posts.push({
     id: i,
     user_id: faker.random.arrayElement(users),
-    title: faker.lorem.words(6),
-    slug: faker.lorem.slug(6),
+    title: title,
+    slug: faker.helpers.slugify(title),
     contents: faker.lorem.paragraphs(),
-    thumbnail: faker.image.imageUrl(),
+    thumbnail: faker.image.imageUrl(400, 400),
+    deleted_at: null,
     created_at: created,
     updated_at: faker.date.between(created, now),
   })
@@ -101,9 +103,10 @@ for (let i = 1; i <= 100; i++) {
   faked.products.push({
     id: i,
     user_id: faker.random.arrayElement(users),
-    name: faker.commerce.product(),
-    price: faker.commerce.price(),
-    thumbnail: faker.image.imageUrl(),
+    name: faker.commerce.productName(),
+    price: parseFloat(faker.commerce.price(100, 500)),
+    thumbnail: faker.image.imageUrl(400, 400),
+    deleted_at: null,
     created_at: created,
     updated_at: faker.date.between(created, now),
   })
