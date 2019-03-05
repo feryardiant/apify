@@ -45,7 +45,7 @@ for (let i = 1; i <= 100; i++) {
 
   faked.albums.push({
     id: i,
-    user_id: faker.random.arrayElement(users),
+    users_id: faker.random.arrayElement(users),
     thumbnail: faker.image[tag](400, 400),
     images: images,
     tag: tag,
@@ -70,7 +70,7 @@ for (let i = 1; i <= 60; i++) {
   created = faker.date.past()
   faked.people.push({
     id: i,
-    user_id: faker.random.arrayElement(users),
+    users_id: faker.random.arrayElement(users),
     name: faker.name.findName(),
     address: faker.address.streetAddress(),
     phone: faker.phone.phoneNumber('(###) ###-####'),
@@ -87,7 +87,7 @@ for (let i = 1; i <= 100; i++) {
   const title = faker.lorem.words(6)
   faked.posts.push({
     id: i,
-    user_id: faker.random.arrayElement(users),
+    users_id: faker.random.arrayElement(users),
     title: title,
     slug: faker.helpers.slugify(title),
     contents: faker.lorem.paragraphs(),
@@ -102,7 +102,7 @@ for (let i = 1; i <= 100; i++) {
   created = faker.date.past()
   faked.products.push({
     id: i,
-    user_id: faker.random.arrayElement(users),
+    users_id: faker.random.arrayElement(users),
     name: faker.commerce.productName(),
     price: parseFloat(faker.commerce.price(100, 500)),
     thumbnail: faker.image.imageUrl(400, 400),
