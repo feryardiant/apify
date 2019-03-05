@@ -61,7 +61,7 @@ module.exports = async (req, res) => {
   try {
     if (!models[table]) {
       status = 404
-      throw new Error('Not found')
+      throw new Error('No resource found')
     }
 
     data = await promisify(done => {
@@ -181,7 +181,7 @@ async function getDatabase(user, repo) {
     const { data: res, status } = await axios.get(repoUrl)
 
     if (status === 200 && !!res.content) {
-      result.database = new Buffer(res.content, res.encoding).toString()
+      result.database = Buffer.from(res.content, res.encoding).toString()
     }
   }
 
@@ -192,15 +192,13 @@ function normalizeResult(result) {
   const schemas = {}
   const seeds = {}
   const relation = {}
-  const clones = JSON.parse(JSON.stringify(result.database))
+  const clones = Object.create(result.database)
   const tables = Object.keys(clones)
 
-  function getObj (arr) {
-    return Array.isArray(arr) ? arr[0] : arr
-  }
-
   for (let table of tables) {
-    const fields = Object.assign({}, getObj(clones[table]))
+    const fields = Array.isArray(clones[table])
+      ? clones[table][0]
+      : clones[table]
 
     if (!fields.hasOwnProperty('id')) {
       fields.id = 0

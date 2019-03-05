@@ -71,6 +71,21 @@ test('should returns 404 if db.sql doent exist', async (t) => {
   })
 })
 
+test('should returns 404 if table doent exist', async (t) => {
+  process.env.DRY = 1
+  const { response } = await t.throwsAsync(async () => {
+    await request({
+      url: `${url}/table`,
+      method: 'GET'
+    })
+  }, Error)
+
+  t.is(response.status, 404)
+  t.deepEqual(response.data, {
+    errors: 'No resource found'
+  })
+})
+
 // test('should returns resource index', async (t) => {
 //   process.env.DRY = 1
 //   const { status, data } = await request({
