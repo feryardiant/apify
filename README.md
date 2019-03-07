@@ -3,7 +3,7 @@
 
 Zero-config fake REST API server.
 
-### Getting Started
+## Getting Started
 
 Create `db.json` file with some data
 
@@ -15,8 +15,7 @@ Create `db.json` file with some data
             "users_id": 1,
             "title": "Foo Bar",
             "contents": "Lorem Ipsum ..."
-        },
-        // ...Another posts
+        }
     ],
     "albums": [
         {
@@ -29,17 +28,14 @@ Create `db.json` file with some data
                 {
                     "name": "http://lorempixel.com/640/480"
                 }
-                // ...Another images
              ]
-        },
-        // ...Another albums
+        }
     ],
     "users": [
         {
             "id": 1,
             "title": "Foo Bar"
-        },
-        // ...Another users
+        }
     ]
 }
 ```
@@ -54,14 +50,14 @@ Which `:table` is wither `posts`, `albums` or `users` from your `db.json` file.
 
 That's it 🍻
 
-### Routing
+## Routing
 
 **SOON**
 
-### Credits
+## Credits
 
 - @typicode/json-server
 
-### License
+## License
 
 MIT - [Fery Wardiyanto](https://github.com/feryardiant)
