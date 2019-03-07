@@ -502,7 +502,7 @@ class RequestParams {
     } else if (this.is('post') && this.key === null) {
       return 'store'
     } else if (this.is('get') && typeof this.key === 'number') {
-      return 'find'
+      return 'show'
     } else if (this.is('put') && typeof this.key === 'number') {
       return 'update'
     } else if (this.is('delete') && typeof this.key === 'number') {

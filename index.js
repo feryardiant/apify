@@ -24,8 +24,8 @@ module.exports = async (req, res) => {
       case 'store':
         result = resource.store(params.input)
         break
-      case 'find':
-        result = resource.find(params.key, params.input)
+      case 'show':
+        result = resource.show(params.key, params.input)
         break
       case 'update':
         result = resource.update(params.key, params.input)
