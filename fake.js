@@ -13,7 +13,7 @@ let created
 const now = new Date()
 const users = []
 
-for (let i = 1; i <= 50; i++) {
+for (let i = 1; i <= 30; i++) {
   created = faker.date.past()
   users.push(i)
   faked.users.push({
@@ -30,7 +30,7 @@ for (let i = 1; i <= 50; i++) {
 
 const albumTags = ['business', 'animals', 'city', 'food', 'nature']
 
-for (let i = 1; i <= 100; i++) {
+for (let i = 1; i <= 60; i++) {
   created = faker.date.past()
   const updated = faker.date.between(created, now)
   const tag = faker.random.arrayElement(albumTags)
@@ -66,7 +66,7 @@ for (let i = 1; i <= 20; i++) {
   })
 }
 
-for (let i = 1; i <= 60; i++) {
+for (let i = 1; i <= 40; i++) {
   created = faker.date.past()
   faked.people.push({
     id: i,
@@ -82,7 +82,7 @@ for (let i = 1; i <= 60; i++) {
   })
 }
 
-for (let i = 1; i <= 100; i++) {
+for (let i = 1; i <= 60; i++) {
   created = faker.date.past()
   const title = faker.lorem.words(6)
   faked.posts.push({
@@ -98,7 +98,7 @@ for (let i = 1; i <= 100; i++) {
   })
 }
 
-for (let i = 1; i <= 100; i++) {
+for (let i = 1; i <= 60; i++) {
   created = faker.date.past()
   faked.products.push({
     id: i,
