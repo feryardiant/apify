@@ -26,7 +26,7 @@ test.after(() => {
 async function request (options) {
   return axios.request(Object.assign({}, options, {
     baseURL,
-    validateStatus (status) {
+    validateStatus(status) {
       return (status >= 200 && status < 300) || status === 404
     }
   }))
@@ -41,9 +41,7 @@ test('should contains user, repo & table params', async (t) => {
   }, Error)
 
   t.is(response.status, 400)
-  t.deepEqual(response.data, {
-    errors: 'Invalid parameters, url must contain `/:user/:repo/:table` parameter'
-  })
+  t.is(response.data.message, 'Invalid parameters, url must contain `/:user/:repo/:table` parameter')
 })
 
 test('should returns 404 if repo doent exist', async (t) => {
@@ -53,9 +51,7 @@ test('should returns 404 if repo doent exist', async (t) => {
   })
 
   t.is(status, 404)
-  t.deepEqual(data, {
-    errors: 'Resource not found'
-  })
+  t.is(data.message, 'Resource not found')
 })
 
 test('should returns 404 if db.sql doent exist', async (t) => {
@@ -65,9 +61,7 @@ test('should returns 404 if db.sql doent exist', async (t) => {
   })
 
   t.is(status, 404)
-  t.deepEqual(data, {
-    errors: 'Resource not found'
-  })
+  t.is(data.message, 'Resource not found')
 })
 
 test('should returns 404 if table doent exist', async (t) => {
@@ -77,9 +71,7 @@ test('should returns 404 if table doent exist', async (t) => {
   })
 
   t.is(status, 404)
-  t.deepEqual(data, {
-    errors: 'Resource not found'
-  })
+  t.is(data.message, 'Resource not found')
 })
 
 test('should returns resource index', async (t) => {

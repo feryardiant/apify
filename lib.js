@@ -1,77 +1,56 @@
+const axios = require('axios')
+
 /**
  * @class Resource
  */
 class Resource {
   /**
-   * @param {Array} model
    * @memberof Resource
+   * @param {Array} model
+   * @param {Object} model
    */
-  constructor (model) {
+  constructor (model, schema = {}) {
     this.status = 200
+    this.schema = Object.assign({}, schema)
     this.model = model.slice(0)
   }
 
   /**
    * @memberof Resource
-   * @static
-   * @param {Object} models
-   * @param {RequestParser} params
-   * @return {{result: {Object}, status: {Number}}}
+   * @param {Object} [input = {}]
+   * @return {Object}
+   * @throws {ApifyError}
    */
-  static handle (models, params) {
-    const resource = new Resource(models[params.resource])
-    let data
-
-    switch (params.type) {
-      case 'index':
-        data = resource.index(params.query)
-        break
-      case 'store':
-        data = resource.store(params.body, params.query)
-        break
-      case 'edit':
-        data = resource.edit(params.key, params.query)
-        break
-      case 'update':
-        data = resource.update(params.key, params.body, params.query)
-        break
-      case 'delete':
-        resource.delete(params.key)
-        break
-
-      default:
-        throw ApifyError.invalidRequest('Unsupported request method')
-        break
-    }
-
-    return {
-      status: resource.status,
-      result: { data }
-    }
+  index (input = {}) {
+    return this.serialize(this.model)
   }
 
   /**
    * @memberof Resource
-   * @param {Object} [query = {}]
+   * @param {Number} id
+   * @param {Object} [input = {}]
    * @return {Object}
    * @throws {ApifyError}
    */
-  index (query = {}) {
-    return this.model
+  show (id, input = {}) {
+    const data = this.find(id)
+
+    return this.serialize(data)
   }
 
   /**
    * @memberof Resource
    * @param {Object} input
-   * @param {Object} [query = {}]
    * @return {Object}
    * @throws {ApifyError}
    */
-  store (input, query = {}) {
+  store (input) {
     const old = this.model.slice(0)
     let data = {}
 
-    for (let field in input) {
+    for (let field in this.schema) {
+      this.isValid(input, field)
+
       data[field] = input[field]
     }
 
@@ -79,34 +58,23 @@ class Resource {
     if (this.model.length > old.length) {
       this.status = 201
     }
-    return data
-  }
 
-  /**
-   * @memberof Resource
-   * @param {Number} id
-   * @param {Object} [query = {}]
-   * @return {Object}
-   * @throws {ApifyError}
-   */
-  edit (id, query = {}) {
-    return this.find(id)
+    return this.serialize(data)
   }
 
   /**
    * @memberof Resource
    * @param {Number} id
    * @param {Object} input
-   * @param {Object} [query = {}]
    * @return {Object}
    * @throws {ApifyError}
    */
-  update (id, input, query = {}) {
+  update (id, input) {
     const data = this.find(id)
 
     let changed = false
-    for (let field in Object.assign({}, data)) {
-      if (!input[field] || data[field] === input[field]) continue
+    for (let field in this.schema) {
+      if (!input[field] || data[field] == input[field]) continue
 
       changed = true
       data[field] = input[field]
@@ -116,17 +84,16 @@ class Resource {
       this.status = 304
     }
 
-    return data
+    return this.serialize(data)
   }
 
   /**
    * @memberof Resource
    * @param {Number} id
-   * @param {Object} query
    * @return {Object}
    * @throws {ApifyError}
    */
-  delete (id, query = {}) {
+  delete (id) {
     const old = this.model.slice(0)
     const data = this.model.filter(r => r.id !== id)
 
@@ -140,7 +107,6 @@ class Resource {
    * @param {Number} id
    * @return {Object}
    * @throws {ApifyError}
-   * @access private
    */
   find (id) {
     const data = this.model.find(row => row.id == id)
@@ -151,25 +117,264 @@ class Resource {
 
     return data
   }
+
+  /**
+   * @access private
+   * @memberof Resource
+   * @param {Object} data
+   * @return {{data: {Object}}}
+   */
+  serialize (data) {
+    return { data }
+  }
+
+  /**
+   * @access private
+   * @memberof Resource
+   * @param {Object} data
+   * @param {string} field
+   * @return {Boolean}
+   */
+  isValid (input, field) {
+    const { type } = this.schema[field]
+
+    if (input[field]) {
+      if (type === 'date' && (Date.parse(input[field]) + 1) > 0) return true
+
+      if (typeof input[field] === type) return true
+
+      throw ApifyError.invalidRequest('Validation Error')
+    }
+
+    return true
+  }
+}
+
+class Database {
+  /**
+   * @memberof Database
+   * @param {String} user
+   * @param {String} repo
+   * @param {String} resource
+   */
+  constructor (user, repo, resource) {
+    const { tmpdir } = require('os')
+    const { resolve } = require('path')
+
+    this.user = user
+    this.repo = repo
+    this.resource = resource
+    this.rawData = {}
+    this.cacheFile = resolve(tmpdir(), `apify-${user}-${repo}.json`)
+  }
+
+  /**
+   * @readonly
+   * @memberof Database
+   * @return {Boolean}
+   */
+  get isSelf () {
+    return this.user === 'feryardiant' && this.repo === 'apify'
+  }
+
+  /**
+   * @readonly
+   * @memberof Database
+   * @return {{schemas: {Object}, rows: {Array}}}
+   */
+  get model () {
+    if (!this.tables.includes(this.resource)) {
+      throw ApifyError.notFound()
+    }
+
+    return {
+      schemas: this.schemas[this.resource],
+      rows: this.rows[this.resource]
+    }
+  }
+
+  /**
+   * @async
+   * @memberof Database
+   * @return {Object}
+   * @throws {ApifyError}
+   */
+  async fetch () {
+    try {
+      const url = `https://api.github.com/repos/${this.user}/${this.repo}/contents/db.json`
+      const { data } = await axios.get(url)
+
+      return Buffer.from(data.content, data.encoding).toString()
+    } catch ({ response, message }) {
+      if (response.status === 404) {
+        throw ApifyError.notFound()
+      }
+      throw new ApifyError(response.status, message)
+    }
+  }
+
+  async initialize (dryRun = false, isDev = false) {
+    if (dryRun) {
+      if (!this.isSelf) {
+        throw ApifyError.notFound()
+      }
+
+      this.rawData = require('./db.json')
+    } else {
+      const { existsSync, writeFileSync } = require('fs')
+
+      if (existsSync(this.cacheFile)) {
+        this.rawData = require(this.cacheFile)
+      } else {
+        this.rawData = await this.fetch()
+
+        if (!isDev) {
+          writeFileSync(this.cacheFile, this.rawData)
+        }
+      }
+    }
+
+    this.normalize()
+  }
+
+  normalize () {
+    const schemas = {}
+    const rows = {}
+    const relations = {}
+    let database = Object.assign({}, this.rawData)
+    let tables = Object.keys(database)
+
+    tables.forEach(table => {
+      let attrs = Array.isArray(database[table])
+        ? database[table][0]
+        : database[table]
+
+      attrs = Object.assign({}, attrs)
+      schemas[table] = {}
+      rows[table] = []
+
+      Object.entries(attrs).forEach(([field, value]) => {
+        let isArr = Array.isArray(value)
+
+        if (/_id$/.test(field)) {
+          field = field.replace(/_id$/, '')
+          value = database[field].find(r => r.id === value) || {}
+        }
+
+        if (isArr || isObject(value)) {
+          const parent = isArr ? table : field
+          const child = isArr ? field : table
+          const rel = `${parent}_id`
+
+          if (!tables.includes(field)) {
+            tables.push(field)
+          }
+
+          value = Object.assign({}, (isArr ? value[0] : value))
+          value.id = value.id || 0
+
+          if (isArr) {
+            value[rel] = 0
+          } else {
+            schemas[table][rel] = 0
+          }
+
+          delete attrs[field]
+          schemas[field] = value
+
+          rows[table] = rows[table] || []
+          rows[field] = rows[field] || []
+          relations[table] = relations[table] || []
+          relations[field] = relations[field] || []
+          relations[parent].push({ child, rel })
+          relations[child].push({ parent, rel })
+          return
+        }
+
+        attrs[field] = value
+      })
+
+      schemas[table] = Object.assign({}, (schemas[table] || {}), attrs)
+    })
+
+    tables.forEach(table => {
+      for (let [field, value] of Object.entries(schemas[table])) {
+        if (field === 'id') {
+          schemas[table][field] = { type: 'number', key: true }
+        } else if (/_at$/.test(field)) {
+          schemas[table][field] = { type: 'date', time: true }
+        } else if (/^(\d)+$/.test(value)) {
+          schemas[table][field] = { type: 'number' }
+        } else {
+          schemas[table][field] = { type: 'text' }
+        }
+      }
+
+      const relation = relations[table].slice(0)
+
+      for (let row of (database[table] || []).slice(0)) {
+        let seed = {}
+
+        for (let [field, value] of Object.entries(row)) {
+          if (Array.isArray(value) && tables.includes(field)) {
+            let { rel } = relation.find(r => r.child === field)
+            value.forEach((val, i) => {
+              val.id = rows[field].length + 1
+              val[rel] = row.id
+              rows[field].push(val)
+            })
+            continue
+          }
+
+          if (isObject(value) && tables.includes(field)) {
+            let { rel } = relation.find(r => r.parent === field)
+            let parent = rows[field].find(p => {
+              for (let f in value) {
+                if (p[f] !== value[f]) return false
+              }
+              return true
+            })
+
+            if (parent) {
+              seed[rel] = parent.id
+            } else {
+              value.id = rows[field].length + 1
+              seed[rel] = value.id
+              rows[field].push(value)
+            }
+            continue
+          }
+
+          seed[field] = value
+        }
+
+        rows[table].push(seed)
+      }
+    })
+
+    this.relations = relations
+    this.schemas = schemas
+    this.rows = rows
+    this.tables = tables
+  }
 }
 
 /**
- * @class RequestParser
+ * @class RequestParams
  * @property {Array} paths
  * @property {String} method
- * @property {any} body
- * @property {Object} query
+ * @property {Object} input
  */
-class RequestParser {
+class RequestParams {
   /**
-   * Creates an instance of RequestParser.
+   * Creates an instance of RequestParams.
    *
+   * @memberof RequestParams
    * @param {String} url
    * @param {String} method
-   * @param {String} body
-   * @memberof RequestParser
+   * @param {Object} body
    */
-  constructor (url, method, body) {
+  constructor (url, method, body = {}) {
     const uri = require('url').parse(url, true)
     this.paths = uri.pathname.slice(1).split('/').filter(p => p)
 
@@ -180,54 +385,63 @@ class RequestParser {
     }
 
     this.method = method.toLowerCase()
-    this.body = body
-    this.query = uri.query
+    this.input = Object.assign({}, body, uri.query)
   }
 
   /**
    * Parse incoming request
    *
    * @static
-   * @memberof RequestParser
+   * @memberof RequestParams
    * @param {http.IncomingMessage} req
-   * @return {RequestParser}
+   * @return {RequestParams}
    */
   static async parse (req) {
-    const chunks = []
     const type = req.headers['content-type']
 
     let body = await promisify(done => {
-      req.on('error', (err) => {
+      const chunks = []
+
+      req.on('error', function onError (err) {
         done(err)
       })
 
-      req.on('data', (chunk) => {
+      req.on('data', function onData (chunk) {
         chunks.push(chunk)
       })
 
-      req.on('end', () => {
-        done(null, Buffer.concat(chunks).toString())
+      req.on('end', function onEnd () {
+        const body = Buffer.concat(chunks).toString('utf-8')
+
+        done(null, body)
+      })
+
+      req.on('close', function onClose () {
+        req.off('error', onError)
+        req.off('data', onData)
+        req.off('end', onEnd)
+        req.off('close', onClose)
       })
     })
 
-    if (type === 'application/x-www-form-urlencoded') {
-      body = require('querystring').parse(body)
-    } else if (type === 'application/json') {
-      body = JSON.parse(body)
-    } else {
-      throw ApifyError.invalidRequest(
-        'Unsupported request `Content-Type`'
-      )
+    if (body) {
+      if (type === 'application/x-www-form-urlencoded') {
+        body = require('querystring').parse(body)
+      } else if (type !== 'application/json') {
+        throw ApifyError.invalidRequest(
+          'Unsupported request `Content-Type`'
+        )
+      }
     }
 
-    return new RequestParser(req.url, req.method, body)
+    return new RequestParams(req.url, req.method, body)
   }
 
   /**
    * Get repo username
    *
    * @readonly
-   * @memberof RequestParser
+   * @memberof RequestParams
    * @return {String}
    */
   get user () {
@@ -238,7 +452,7 @@ class RequestParser {
    * Get repo name
    *
    * @readonly
-   * @memberof RequestParser
+   * @memberof RequestParams
    * @return {String}
    */
   get repo () {
@@ -249,7 +463,7 @@ class RequestParser {
    * Get resource name
    *
    * @readonly
-   * @memberof RequestParser
+   * @memberof RequestParams
    * @return {String}
    */
   get resource () {
@@ -260,7 +474,7 @@ class RequestParser {
    * Get resource key
    *
    * @readonly
-   * @memberof RequestParser
+   * @memberof RequestParams
    * @return {Number|String|null}
    */
   get key () {
@@ -277,23 +491,41 @@ class RequestParser {
    * Get request type
    *
    * @readonly
-   * @memberof RequestParser
+   * @memberof RequestParams
    * @return {String|null}
    */
   get type () {
-    if (this.method === 'get' && this.key === null) {
+    if (this.is('get') && this.key === null) {
       return 'index'
-    } else if (this.method === 'post' && this.key === null) {
+    } else if (this.is('get') && this.key === 'create') {
+      return 'create'
+    } else if (this.is('post') && this.key === null) {
       return 'store'
-    } else if (this.method === 'get' && typeof this.key === 'number') {
-      return 'edit'
-    } else if (this.method === 'put' && typeof this.key === 'number') {
+    } else if (this.is('get') && typeof this.key === 'number') {
+      return 'find'
+    } else if (this.is('put') && typeof this.key === 'number') {
       return 'update'
-    } else if (this.method === 'delete' && typeof this.key === 'number') {
+    } else if (this.is('delete') && typeof this.key === 'number') {
       return 'delete'
     } else {
       return null
     }
+  }
+
+  /**
+   * Determine method
+   *
+   * @memberof RequestParams
+   * @param {String} method
+   * @return {Boolean}
+   * @throws {TypeError}
+   */
+  is (...methods) {
+    if (methods.length === 0) {
+      throw new TypeError('RequestParams.is() Argument required')
+    }
+
+    return methods.includes(this.method)
   }
 }
 
@@ -303,9 +535,16 @@ class RequestParser {
  * @property {Number} status
  */
 class ApifyError extends Error {
-  constructor (status, message) {
+  /**
+   * @param {Number} status
+   * @param {String} message
+   * @param {Array} [errors=[]]
+   * @memberof ApifyError
+   */
+  constructor (status, message, errors) {
     super(message)
     this.status = status
+    this.errors = errors
   }
 
   /**
@@ -338,14 +577,22 @@ function promisify (cb) {
   return new Promise((resolve, reject) => {
     cb((err, data) => {
       if (err) return reject(err)
-
-      return resolve(data || true)
+      return resolve(data)
     })
   })
 }
 
+/**
+ * @param {any} value
+ * @return {Boolean}
+ */
+function isObject (value) {
+  return value !== null && value.constructor.name === 'Object'
+}
+
 module.exports = {
-  Resource,
-  RequestParser,
-  ApifyError
+  ApifyError,
+  Database,
+  RequestParams,
+  Resource
 }
