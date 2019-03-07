@@ -6,6 +6,22 @@
   "homepage": "https://github.com/feryardiant/apify",
   "license": "MIT",
   "main": "index.js",
+  "keywords": [
+    "JSON",
+    "server",
+    "fake",
+    "REST",
+    "API",
+    "prototyping",
+    "mock",
+    "mocking",
+    "test",
+    "testing",
+    "rest",
+    "data",
+    "dummy",
+    "sandbox"
+  ],
   "scripts": {
     "start": "micro",
     "serve": "micro-dev",
@@ -21,11 +37,6 @@
   "bugs": {
     "url": "https://github.com/feryardiant/apify/issues"
   },
-  "keywords": [
-    "mock",
-    "json",
-    "api"
-  ],
   "dependencies": {
     "axios": "^0.18.0",
     "micro": "^9.3.3"
