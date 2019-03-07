@@ -1,6 +1,6 @@
 const { Database, Resource, RequestParams, ApifyError } = require('./lib')
 const dryRun = !!process.env.DRY
-const isDev = process.env.NODE_ENV !== 'production'
+const isDev = process.env.NODE_ENV === 'development'
 
 /**
  * @async
