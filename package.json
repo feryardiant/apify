@@ -1,9 +1,9 @@
 {
   "name": "apify",
   "version": "0.0.1",
-  "description": "Mock API Server",
+  "description": "Zero-config fake REST API server.",
   "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
-  "homepage": "https://apify.now.sh/",
+  "homepage": "https://github.com/feryardiant/apify",
   "license": "MIT",
   "main": "index.js",
   "scripts": {
