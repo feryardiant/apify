@@ -1,6 +1,5 @@
 const { send, json } = require('micro')
 const axios = require('axios')
-const { openSync, closeSync } = require('fs')
 
 const connections = {}
 const caches = []
@@ -22,89 +21,74 @@ module.exports = async (req, res) => {
   }
 
   const [user, repo, table, ...segments] = paths
-  let db, status, data, input = {}
 
   try {
-    db = await getDatabase(user, repo)
-  } catch (err) {
-    const status = err.response && err.response.status
-    return send(res, status || 500, {
-      errors: status === 404
-        ? 'Repository doen\'t exists or doesn\'t have db.json file'
-        : err.message
-    })
-  }
+    const db = await getDatabase(user, repo)
+    const models = migrations[db.name]
 
-  try {
-    const conn = await connect(db.name)
+    let data, input = {}
+    let status = 200
+    const method = req.method.toLowerCase()
 
-    if (!migrations[db.name]) {
-      migrations[db.name] = await migrate(conn, db)
-    }
-  } catch (err) {
-    console.error(err)
-    return send(res, 500, {
-      errors: err.message,
-      // schemas: db.schemas,
-      // seeds: db.seeds,
-    })
-  }
-
-  const models = migrations[db.name]
-
-  status = 200
-  const method = req.method.toLowerCase()
-  if (['post', 'put'].includes(method)) {
-    input = await getInput(req)
-  }
-
-  try {
-    if (!models[table]) {
-      status = 404
-      throw new Error('No resource found')
+    if (['post', 'put'].includes(method)) {
+      input = await getInput(req)
     }
 
-    data = await promisify(done => {
-      if (method === 'get' && segments.length === 0) {
-        models[table].find(done)
-      } else if (method === 'post' && segments.length === 0) {
-        models[table].create(input, done)
-      } else if (method === 'get' && segments.length === 1) {
-        models[table].get(segments[0], done)
-      } else if (method === 'put' && segments.length === 1) {
-        models[table].get(segments[0], (err, model) => {
-          if (err) return done(err)
+    if (!db.tables.includes(table)) {
+      throw ApifyError.notFound()
+    }
 
-          for (let field of Object.keys(input)) {
-            if (model[field] === input[field] || !input[field]) continue
+    const model = db.seeds[table].slice(0)
 
-            model[field] = input[field]
-          }
+    if (method === 'get' && segments.length === 0) {
+      data = model
+    } else if (method === 'post' && segments.length === 0) {
+      data = model.push(input)
+    } else if (method === 'get' && segments.length === 1) {
+      data = model.find(row => row.id == segments[0])
 
-          model.save(done)
-        })
-      } else if (method === 'delete' && segments.length === 1) {
-        models[table].get(segments[0], (err, model) => {
-          if (err) return done(err)
-
-          model.remove(done)
-        })
-      } else {
-        done(new Error('Unsupported method'))
+      if (!data) {
+        throw ApifyError.notFound()
       }
-    })
+    } else if (method === 'put' && segments.length === 1) {
+      data = model.find(row => row.id == segments[0])
+
+      if (!data) {
+        throw ApifyError.notFound()
+      }
+
+      let changed = false
+      for (let field in data) {
+        if (data[field] == input[field] || !input[field]) continue
+
+        changed = true
+        data[field] = input[field]
+      }
+
+      status = changed ? 200 : 304
+    } else if (method === 'delete' && segments.length === 1) {
+      data = model.find(row => row.id == segments[0])
+
+      if (!data) {
+        throw ApifyError.notFound()
+      }
+
+      const kept = model.slice(0).filter(row => row.id !== segments[0])
+      status = 304
+      if (kept.length < model.length) {
+        status = 204
+        data = undefined
+      }
+    } else {
+      throw ApifyError.invalidRequest()
+    }
+
+    return send(res, status, { data })
   } catch (err) {
-    console.error(err, models)
-    status = err.code === 'SQLITE_ERROR' ? 500 : status
-    return send(res, status, {
+    return send(res, err.status, {
       errors: err.message,
-      tables: db.tables,
-      schemas: db.schemas,
-      seeds: db.seeds,
     })
   }
-
-  return send(res, status, { data })
 }
 
 /**
@@ -139,28 +123,6 @@ function getInput (req) {
 
 /**
  * @async
- * @param {String} database
- * @return {ORM}
- */
-async function connect (database) {
-  if (!connections[database]) {
-    const { tmpdir } = require('os')
-    const { join } = require('path')
-    const orm = require('orm')
-
-    database = join(tmpdir(), database)
-    closeSync(openSync(database, 'a+'))
-
-    connections[database] = await promisify(done => {
-      orm.connect({ pathname: database, protocol: 'sqlite'}, done)
-    })
-  }
-
-  return connections[database]
-}
-
-/**
- * @async
  * @param {String} user
  * @param {String} repo
  * @return {{user: {String}, repo: {String}, name: {String}, definition: {String}}}
@@ -175,13 +137,32 @@ async function getDatabase(user, repo) {
   const result = { user, repo, name: `${user}-${repo}.db` }
 
   if (dryrun) {
+    if (user !== 'feryardiant' && repo !== 'apify') {
+      throw ApifyError.notFound()
+    }
+
     result.database = require('./db.json')
   } else {
-    const repoUrl = `https://api.github.com/repos/${user}/${repo}/contents/db.json`
-    const { data: res, status } = await axios.get(repoUrl)
+    const { existsSync, writeFileSync } = require('fs')
+    result.cached = `./${user}-${repo}.json`
 
-    if (status === 200 && !!res.content) {
-      result.database = Buffer.from(res.content, res.encoding).toString()
+    if (existsSync(result.cached)) {
+      result.database = require(result.cached)
+    } else {
+      try {
+        const repoUrl = `https://api.github.com/repos/${user}/${repo}/contents/db.json`
+        const { data: res, status } = await axios.get(repoUrl)
+
+        result.database = Buffer.from(res.content, res.encoding).toString()
+
+        writeFileSync(result.cached, result.database)
+      } catch ({ response }) {
+        if (response.status === 404) {
+          throw ApifyError.notFound()
+        }
+
+        throw new ApifyError(response.status, response.message)
+      }
     }
   }
 
@@ -191,142 +172,145 @@ async function getDatabase(user, repo) {
 function normalizeResult(result) {
   const schemas = {}
   const seeds = {}
-  const relation = {}
-  const clones = Object.create(result.database)
-  const tables = Object.keys(clones)
+  const relations = {}
+  let database = Object.assign({}, result.database)
+  let tables = Object.keys(database)
 
-  for (let table of tables) {
-    const fields = Array.isArray(clones[table])
-      ? clones[table][0]
-      : clones[table]
+  tables.forEach(table => {
+    let attrs = Array.isArray(database[table])
+      ? database[table][0]
+      : database[table]
 
-    if (!fields.hasOwnProperty('id')) {
-      fields.id = 0
-    }
+    attrs = Object.assign({}, attrs)
     schemas[table] = {}
+    seeds[table] = []
 
-    for (let field of Object.keys(fields)) {
-      const value = fields[field]
-      const isArray = Array.isArray(value)
+    Object.entries(attrs).forEach(([field, value]) => {
+      let isArr = Array.isArray(value)
 
-      if (isArray || isObject(value)) {
-        const parent = isArray ? table : field
-        const child = isArray ? field : table
-        const rel = `${parent}_id`
-
-        if (!tables.includes(child)) {
-          tables.push(child)
-        }
-        if (!clones.hasOwnProperty(child)) {
-          clones[child] = []
-        }
-        if (!relation.hasOwnProperty(parent)) {
-          relation[parent] = []
-        }
-
-        if (isArray) {
-          value[0][rel] = 0
-          clones[child].push(value[0])
-        } else {
-          // value[rel] = 0
-          // schemas[parent] = value
-          clones[child][0][rel] = 0
-        }
-
-        relation[parent].push({ child, rel })
-
-        continue
+      if (/_id$/.test(field)) {
+        field = field.replace(/_id$/, '')
+        value = result.database[field].find(r => r.id === value) || {}
       }
 
-      // if (/_id$/.test(field)) {
-      //   let related = field.replace(/_id$/, '')
-      //   if (!relation.hasOwnProperty(related)) {
-      //     relation[related] = []
-      //   }
-      //   relation[related].push(table)
-      // }
+      if (isArr || isObject(value)) {
+        const parent = isArr ? table : field
+        const child = isArr ? field : table
+        const rel = `${parent}_id`
 
-      schemas[table][field] = getFieldAttr(field, value)
+        if (!tables.includes(field)) {
+          tables.push(field)
+        }
+
+        value = Object.assign({}, (isArr ? value[0] : value))
+        value.id = value.id || 0
+
+        if (isArr) {
+          value[rel] = 0
+        } else {
+          schemas[table][rel] = 0
+        }
+
+        delete attrs[field]
+        schemas[field] = value
+
+        seeds[parent] = seeds[parent] || []
+        seeds[child] = seeds[child] || []
+        relations[parent] = relations[parent] || []
+        relations[child] = relations[child] || []
+        relations[parent].push({ child, rel })
+        relations[child].push({ parent, rel })
+        return
+      }
+
+      attrs[field] = value
+    })
+
+    schemas[table] = Object.assign({}, (schemas[table] || {}), attrs)
+  })
+
+  tables.forEach(table => {
+    for (let [field, value] of Object.entries(schemas[table])) {
+      if (field === 'id') {
+        schemas[table][field] = { type: 'number', key: true }
+      } else if (/_at$/.test(field)) {
+        schemas[table][field] = { type: 'date', time: true }
+      } else if (/^(\d)+$/.test(value)) {
+        schemas[table][field] = { type: 'number' }
+      } else {
+        schemas[table][field] = { type: 'text' }
+      }
     }
-  }
 
-  for (let table of tables) {
-    seeds[table] = []
-    // seeds[table] = clones[table].map(values => {
-    //   for (let { child, rel } of (relation[table] || [])) {
-    //     // const parent =
-    //     if (clones[child]) {
-    //       clones[child] = clones[child].length > 1 ? clones[child] : []
-    //       if (Array.isArray(values[child])) {
-    //         values[child].map((val, i) => {
-    //           val.id = clones[child].length + i + 1
-    //           val[rel] = values.id
-    //           return val
-    //         })
-    //         clones[child].push(...values[child])
-    //       } else {
-    //         values[rel] = values[child].id
-    //         clones[child].push(values[child])
-    //       }
-    //       delete values[child]
-    //     }
-    //   }
+    const relation = relations[table].slice(0)
 
-    //   return values
-    // })
-  }
+    for (let row of (database[table] || []).slice(0)) {
+      let seed = {}
 
+      for (let [field, value] of Object.entries(row)) {
+        if (Array.isArray(value) && tables.includes(field)) {
+          let { rel } = relation.find(r => r.child === field)
+          value.forEach((val, i) => {
+            val.id = seeds[field].length + 1
+            val[rel] = row.id
+            seeds[field].push(val)
+          })
+          continue
+        }
+
+        if (isObject(value) && tables.includes(field)) {
+          let { rel } = relation.find(r => r.parent === field)
+          let parent = seeds[field].find(p => {
+            for (let f in value) {
+              if (p[f] !== value[f]) return false
+            }
+            return true
+          })
+
+          if (parent) {
+            seed[rel] = parent.id
+          } else {
+            value.id = seeds[field].length + 1
+            seed[rel] = value.id
+            seeds[field].push(value)
+          }
+          continue
+        }
+
+        seed[field] = value
+      }
+
+      seeds[table].push(seed)
+    }
+  })
+
+  result.relations = relations
   result.schemas = schemas
   result.seeds = seeds
   result.tables = tables
 
-  caches.push(result)
+  // caches.push(result)
 
   return result
 }
 
+function resolvePath (...paths) {
+  const { openSync, closeSync } = require('fs')
+  const { resolve } = require('path')
+
+  const filepath = resolve(...paths)
+
+  try {
+    closeSync(openSync(filepath, 'a'))
+  } catch (err) {
+    console.error(err)
+  }
+
+  return filepath
+}
+
 function isObject (value) {
   return value !== null && value.constructor.name === 'Object'
-}
-
-async function migrate (db, { tables = [], schemas = {}, seeds = {} } = {}) {
-  const models = {}
-
-  for (const table of tables) {
-    const model = db.define(table, schemas[table])
-    const exists = await model.existsAsync()
-
-    await model.syncPromise()
-
-    if (exists && seeds[table].length > 0) {
-      model.createAsync(seeds[table])
-      console.info(table, 'created')
-    }
-
-    models[table] = model
-  }
-
-  return models
-}
-
-function getFieldAttr (field, value) {
-  const attrs = {
-    type: 'text'
-  }
-
-  if (field === 'id') {
-    attrs.type = 'number'
-    attrs.primary = true
-  } else if (/_at$/.test(field)) {
-    attrs.type = 'date'
-    if (parseInt(Date.parse(value).toString().slice(8)) > 0) {
-      attrs.time = true
-    }
-  } else if (/^(\d)+$/.test(value)) {
-    attrs.type = 'integer'
-  }
-
-  return attrs
 }
 
 function promisify (cb) {
@@ -337,4 +321,19 @@ function promisify (cb) {
       return resolve(data || true)
     })
   })
+}
+
+class ApifyError extends Error {
+  constructor (status, message) {
+    super(message)
+    this.status = status
+  }
+
+  static notFound (message = 'Resource not found') {
+    return new ApifyError(404, message)
+  }
+
+  static invalidRequest (message) {
+    return new ApifyError(400, message)
+  }
 }

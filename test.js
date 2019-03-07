@@ -25,7 +25,10 @@ test.after(() => {
  */
 async function request (options) {
   return axios.request(Object.assign({}, options, {
-    baseURL
+    baseURL,
+    validateStatus (status) {
+      return (status >= 200 && status < 300) || status === 404
+    }
   }))
 }
 
@@ -44,55 +47,47 @@ test('should contains user, repo & table params', async (t) => {
 })
 
 test('should returns 404 if repo doent exist', async (t) => {
-  const { response } = await t.throwsAsync(async () => {
-    await request({
-      url: '/feryardiant/foobar/table',
-      method: 'GET'
-    })
-  }, Error)
+  const { status, data } = await request({
+    url: '/feryardiant/foobar/table',
+    method: 'GET'
+  })
 
-  t.is(response.status, 404)
-  t.deepEqual(response.data, {
-    errors: 'Repository doen\'t exists or doesn\'t have db.json file'
+  t.is(status, 404)
+  t.deepEqual(data, {
+    errors: 'Resource not found'
   })
 })
 
 test('should returns 404 if db.sql doent exist', async (t) => {
-  const { response } = await t.throwsAsync(async () => {
-    await request({
-      url: '/feryardiant/dotfiles/table',
-      method: 'GET'
-    })
-  }, Error)
+  const { status, data } = await request({
+    url: '/feryardiant/dotfiles/table',
+    method: 'GET'
+  })
 
-  t.is(response.status, 404)
-  t.deepEqual(response.data, {
-    errors: 'Repository doen\'t exists or doesn\'t have db.json file'
+  t.is(status, 404)
+  t.deepEqual(data, {
+    errors: 'Resource not found'
   })
 })
 
 test('should returns 404 if table doent exist', async (t) => {
-  process.env.DRY = 1
-  const { response } = await t.throwsAsync(async () => {
-    await request({
-      url: `${url}/table`,
-      method: 'GET'
-    })
-  }, Error)
+  const { status, data } = await request({
+    url: `${url}/table`,
+    method: 'GET'
+  })
 
-  t.is(response.status, 404)
-  t.deepEqual(response.data, {
-    errors: 'No resource found'
+  t.is(status, 404)
+  t.deepEqual(data, {
+    errors: 'Resource not found'
   })
 })
 
-// test('should returns resource index', async (t) => {
-//   process.env.DRY = 1
-//   const { status, data } = await request({
-//     url: `${url}/albums`,
-//     method: 'GET'
-//   })
+test('should returns resource index', async (t) => {
+  const { status, data } = await request({
+    url: `${url}/albums`,
+    method: 'GET'
+  })
 
-//   t.is(status, 200)
-//   t.is(data.data.length, db.albums.length)
-// })
+  t.is(status, 200)
+  t.is(data.data.length, db.albums.length)
+})
