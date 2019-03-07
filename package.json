@@ -17,9 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.0",
-    "micro": "^9.3.3",
-    "orm": "^5.0.4",
-    "sqlite3": "^4.0.6"
+    "micro": "^9.3.3"
   },
   "devDependencies": {
     "ava": "^1.2.1",
