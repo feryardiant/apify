@@ -31,7 +31,7 @@ module.exports = async (req, res) => {
         result = resource.update(params.key, params.input)
         break
       case 'delete':
-        resource.delete(params.key)
+        result = resource.delete(params.key)
         break
 
       default:
