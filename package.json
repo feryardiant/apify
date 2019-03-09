@@ -9,6 +9,10 @@
   "directories": {
     "test": "tape test/*.test.js"
   },
+  "files": [
+    "*.js",
+    "db.json"
+  ],
   "keywords": [
     "JSON",
     "server",
