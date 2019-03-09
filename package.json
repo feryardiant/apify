@@ -35,7 +35,7 @@
     "test": "tape test/*.test.js | tap-dot"
   },
   "engines": {
-    "node": "^8.15 ^10.15"
+    "node": "^8.15 || ^10.15"
   },
   "repository": {
     "type": "git",
