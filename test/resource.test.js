@@ -106,18 +106,25 @@ test('Delete data', t => {
     t.is(err.status, 404, 'Should throw 404 if deleteing non-existing data')
   }
 
-  const softDeletes = new Resource([
-    { id: 1, name: 'John Doe', deleted_at: null }
+  t.end()
+})
+
+test('Soft-Delete data', t => {
+  const resource = new Resource([
+    { id: 1, name: 'John Doe', deleted_at: null },
+    { id: 2, name: 'Jane Doe', deleted_at: null },
+    { id: 3, name: 'Sally Doe', deleted_at: null }
   ], {
     id: { type: 'number', key: true },
     name: { type: 'text' },
     deleted_at: { type: 'date' }
   })
 
-  softDeletes.delete(1)
+  resource.delete(3)
 
-  t.is(softDeletes.status, 204, 'Should returns 204 if success')
-  t.is(softDeletes.index({ deleted: true }).data.length, 1, 'Should show deleted data count')
+  t.is(resource.status, 204, 'Should returns 204 if success')
+  t.is(resource.index().meta.total, 2, 'Should have less data')
+  // t.is(resource.index({ deleted: true }).meta.total, 1, 'Should have deleted data')
 
   t.end()
 })

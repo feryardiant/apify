@@ -23,7 +23,7 @@ test('Request path', t => {
   t.end()
 })
 
-test('Parsing request para', t => {
+test('Parsing request url', t => {
   const params = new RequestParams('/username/repository/table/1', 'GET')
 
   t.is(params.user, 'username', 'Should parse username')
@@ -31,6 +31,14 @@ test('Parsing request para', t => {
   t.is(params.resource, 'table', 'Should parse table name')
   t.is(params.key, 1, 'Should return table key as number')
   t.is(params.method, 'get', 'Should change case method')
+
+  t.end()
+})
+
+test('Parsing query string', t => {
+  let params = new RequestParams('/username/repository/table?foo=bar&baz=yes&bang=1')
+
+  t.same(params.input, { foo: 'bar', baz: true, bang: 1 }, 'Should parse username')
 
   t.end()
 })

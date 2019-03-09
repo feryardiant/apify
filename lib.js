@@ -14,6 +14,8 @@ class Resource {
   }
 
   /**
+   * @readonly
+   * @memberof Resource
    * @return {Boolean}
    */
   get hasTimestamps () {
@@ -21,6 +23,8 @@ class Resource {
   }
 
   /**
+   * @readonly
+   * @memberof Resource
    * @return {Boolean}
    */
   get hasUpdateTimestamp () {
@@ -28,6 +32,8 @@ class Resource {
   }
 
   /**
+   * @readonly
+   * @memberof Resource
    * @return {Boolean}
    */
   get hasCreateTimestamp () {
@@ -35,6 +41,8 @@ class Resource {
   }
 
   /**
+   * @readonly
+   * @memberof Resource
    * @return {Boolean}
    */
   get isSoftDelete () {
@@ -43,17 +51,26 @@ class Resource {
 
   /**
    * Get model copy
+   *
+   * @readonly
+   * @memberof Resource
    * @return {Array}
    */
   get copy () {
     return (this.model || []).slice(0)
   }
 
+  /**
+   * @readonly
+   * @memberof Resource
+   * @return {String}
+   */
   get primaryKey () {
     let primary
     for (let field in this.schema) {
       if (this.schema[field].key === true) {
         primary = field
+        break
       }
     }
     return primary
@@ -284,13 +301,8 @@ class Resource {
   }
 
   sortBy(field, order = 'desc') {
-    const {
-      type
-    } = this.schema[field]
-    const {
-      compareAsc,
-      compareDesc
-    } = require('date-fns')
+    const { type } = this.schema[field]
+    const { compareAsc, compareDesc } = require('date-fns')
     const compare = order === 'asc' ? compareAsc : compareDesc
 
     return (a, b) => {
@@ -372,8 +384,9 @@ class Database {
     const axios = require('axios')
 
     try {
-      const url = `https://api.github.com/repos/${this.user}/${this.repo}/contents/db.json`
-      const { data } = await axios.get(url)
+      const { data } = await axios.get(`/${this.user}/${this.repo}/contents/db.json`, {
+        baseURL: 'https://api.github.com/repos'
+      })
 
       return Buffer.from(data.content, data.encoding).toString()
     } catch ({ response, message }) {
@@ -384,12 +397,8 @@ class Database {
     }
   }
 
-  async initialize (dryRun = false, isDev = false) {
+  async initialize (dryRun = this.isSelf, isDev = false) {
     if (dryRun) {
-      if (!this.isSelf) {
-        throw ApifyError.notFound()
-      }
-
       this.rawData = require('./db.json')
     } else {
       const { existsSync, writeFileSync } = require('fs')
@@ -416,11 +425,8 @@ class Database {
     let tables = Object.keys(database)
 
     tables.forEach(table => {
-      let attrs = Array.isArray(database[table])
-        ? database[table][0]
-        : database[table]
+      let attrs = Object.assign({}, database[table][0])
 
-      attrs = Object.assign({}, attrs)
       schemas[table] = {}
       rows[table] = []
 
@@ -542,10 +548,10 @@ class RequestParams {
    *
    * @memberof RequestParams
    * @param {String} url
-   * @param {String} method
-   * @param {Object} body
+   * @param {String} [method='GET']
+   * @param {Object} [body={}]
    */
-  constructor (url, method, body = {}) {
+  constructor (url, method = 'GET', body = {}) {
     const uri = require('url').parse(url, true)
     this.paths = uri.pathname.slice(1).split('/').filter(p => p)
 
@@ -559,6 +565,13 @@ class RequestParams {
     this.rawInput = Object.assign({}, body, uri.query)
   }
 
+  /**
+   * Normalized query string or request body
+   *
+   * @readonly
+   * @memberof RequestParams
+   * @return {Object}
+   */
   get input () {
     const input = {}
 
@@ -589,26 +602,31 @@ class RequestParams {
     let body = await promisify(done => {
       const chunks = []
 
-      req.on('error', function onError (err) {
+      function onError (err) {
         done(err)
-      })
+      }
 
-      req.on('data', function onData (chunk) {
+      function onData (chunk) {
         chunks.push(chunk)
-      })
+      }
 
-      req.on('end', function onEnd () {
+      function onEnd () {
         const body = Buffer.concat(chunks).toString('utf-8')
 
         done(null, body)
-      })
+      }
 
-      req.on('close', function onClose () {
+      function onClose () {
         req.off('error', onError)
         req.off('data', onData)
         req.off('end', onEnd)
         req.off('close', onClose)
-      })
+      }
+
+      req.on('error', onError)
+      req.on('data', onData)
+      req.on('end', onEnd)
+      req.on('close', onClose)
     })
 
     if (body) {
