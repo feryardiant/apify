@@ -1,5 +1,3 @@
-const axios = require('axios')
-
 /**
  * @class Resource
  */
@@ -49,10 +47,9 @@ class Resource {
     let data = {}
 
     for (let field in this.schema) {
-      this.isValid(input, field)
-
       data[field] = input[field]
     }
+    data.id = old.length + 1
 
     this.model.push(data)
     if (this.model.length > old.length) {
@@ -94,10 +91,11 @@ class Resource {
    * @throws {ApifyError}
    */
   delete (id) {
+    const found = this.find(id)
     const old = this.model.slice(0)
-    const data = this.model.filter(r => r.id !== id)
+    this.model = this.model.filter(r => r.id !== found.id)
 
-    this.status = data.length < old.length ? 204 : 304
+    this.status = this.model.length < old.length ? 204 : 304
 
     return null
   }
@@ -200,6 +198,8 @@ class Database {
    * @throws {ApifyError}
    */
   async fetch () {
+    const axios = require('axios')
+
     try {
       const url = `https://api.github.com/repos/${this.user}/${this.repo}/contents/db.json`
       const { data } = await axios.get(url)
