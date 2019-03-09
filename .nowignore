@@ -1,3 +1,4 @@
 node_modules
 fake.js
-index.spec.js
+test/*.test.js
+Procfile
