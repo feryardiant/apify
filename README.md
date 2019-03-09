@@ -17,15 +17,15 @@ Create `db.json` file with some data
 ```json
 {
   "posts": [
-      {
-        "id": 1,
-        "users": {
-          "username": "john.doe",
-          "email": "john.doe@example.com",
-        },
-        "title": "Foo Bar",
-        "contents": "Lorem Ipsum ..."
-      }
+    {
+      "id": 1,
+      "users": {
+        "username": "john.doe",
+        "email": "john.doe@example.com",
+      },
+      "title": "Foo Bar",
+      "contents": "Lorem Ipsum ..."
+    }
   ],
   "albums": [
     {
