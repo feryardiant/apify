@@ -8,6 +8,9 @@ const isDev = process.env.NODE_ENV === 'development'
  * @param {http.ServerResponse} res
  */
 module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE')
+
   try {
     const params = await RequestParams.parse(req)
     const db = new Database(params.user, params.repo, params.resource)
