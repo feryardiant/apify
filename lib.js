@@ -14,13 +14,72 @@ class Resource {
   }
 
   /**
+   * @return {Boolean}
+   */
+  get hasTimestamps () {
+    return this.hasCreateTimestamp || this.hasUpdateTimestamp
+  }
+
+  /**
+   * @return {Boolean}
+   */
+  get hasUpdateTimestamp () {
+    return this.schema.hasOwnProperty('updated_at')
+  }
+
+  /**
+   * @return {Boolean}
+   */
+  get hasCreateTimestamp () {
+    return this.schema.hasOwnProperty('created_at')
+  }
+
+  /**
+   * @return {Boolean}
+   */
+  get isSoftDelete () {
+    return this.schema.hasOwnProperty('deleted_at')
+  }
+
+  /**
+   * Get model copy
+   * @return {Array}
+   */
+  get copy () {
+    return (this.model || []).slice(0)
+  }
+
+  /**
    * @memberof Resource
    * @param {Object} [input = {}]
    * @return {Object}
    * @throws {ApifyError}
    */
-  index (input = {}) {
-    return this.serialize(this.model)
+  index ({ page = 1, perPage = 15, ...input } = {}) {
+    let model = this.copy
+
+    if (this.isSoftDelete) {
+      model = model.filter(row => {
+        if (input.deleted) {
+          return row.deleted_at !== null
+        } else {
+          return row.deleted_at === null
+        }
+      })
+    }
+
+    if (page < 0 || perPage < 0) {
+      return this.serialize(model, {
+        page: 0,
+        perPage: 0,
+        total: model.length
+      })
+    }
+
+    const start = perPage * (page - 1)
+    const sliced = model.slice(start, (perPage * page))
+
+    return this.serialize(sliced, { page, perPage, total: sliced.length })
   }
 
   /**
@@ -43,7 +102,7 @@ class Resource {
    * @throws {ApifyError}
    */
   store (input) {
-    const old = this.model.slice(0)
+    const old = this.copy
     let data = {}
 
     for (let field in this.schema) {
@@ -54,6 +113,8 @@ class Resource {
     this.model.push(data)
     if (this.model.length > old.length) {
       this.status = 201
+
+      this.timestamp('created', data)
     }
 
     return this.serialize(data)
@@ -77,7 +138,9 @@ class Resource {
       data[field] = input[field]
     }
 
-    if (!changed) {
+    if (changed) {
+      this.timestamp('updated', data)
+    } else {
       this.status = 304
     }
 
@@ -91,11 +154,16 @@ class Resource {
    * @throws {ApifyError}
    */
   delete (id) {
-    const found = this.find(id)
-    const old = this.model.slice(0)
-    this.model = this.model.filter(r => r.id !== found.id)
+    const data = this.find(id)
+    const old = this.copy
+    let deleted = false
 
-    this.status = this.model.length < old.length ? 204 : 304
+    if (!this.timestamp('deteled', data)) {
+      this.model = this.model.filter(r => r.id !== data.id)
+      deleted = this.model.length < old.length
+    }
+
+    this.status = deleted ? 204 : 304
 
     return null
   }
@@ -107,7 +175,7 @@ class Resource {
    * @throws {ApifyError}
    */
   find (id) {
-    const data = this.model.find(row => row.id == id)
+    const data = this.copy.find(row => row.id == id)
 
     if (!data) {
       throw ApifyError.notFound()
@@ -120,10 +188,18 @@ class Resource {
    * @access private
    * @memberof Resource
    * @param {Object} data
+   * @param {Object} [meta={}]
    * @return {{data: {Object}}}
    */
-  serialize (data) {
-    return { data }
+  serialize (data, meta = {}) {
+    meta = Object.assign({}, meta, {
+      field: this.schema
+    })
+
+    return {
+      data,
+      meta
+    }
   }
 
   /**
@@ -145,6 +221,42 @@ class Resource {
     }
 
     return true
+  }
+
+  /**
+   * Update timestamp
+   *
+   * @memberof Resource
+   * @param {String} event Timestamp event either: created, updated or deleted
+   * @param {Object} [data={}] Data object
+   * @return {Boolean}
+   */
+  timestamp(event, data = {}) {
+    const stamp = new Date().toString()
+
+    if (event === 'created' && this.hasCreateTimestamp) {
+      data.created_at = stamp
+      if (this.hasUpdateTimestamp) {
+        data.updated_at = stamp
+      }
+      return true
+    }
+
+    if (event === 'updated' && this.hasUpdateTimestamp) {
+      data.updated_at = stamp
+      return true
+    }
+
+    if (event === 'deleted' && this.isSoftDelete) {
+      const deleted = data.deleted_at !== null
+
+      if (!deleted) {
+        data.deleted_at = stamp
+        return true
+      }
+    }
+
+    return false
   }
 }
 

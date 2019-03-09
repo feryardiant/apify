@@ -2,18 +2,9 @@ const test = require('tape')
 const { Resource, ApifyError } = require('../lib')
 
 const model = [
-  {
-    id: 1,
-    name: 'John Doe'
-  },
-  {
-    id: 2,
-    name: 'Jane Doe'
-  },
-  {
-    id: 3,
-    name: 'Sally Doe'
-  }
+  { id: 1, name: 'John Doe' },
+  { id: 2, name: 'Jane Doe' },
+  { id: 3, name: 'Sally Doe' }
 ]
 const schema = {
   id: { type: 'serial', key: true },
@@ -21,14 +12,23 @@ const schema = {
 }
 
 test('Show all data', t => {
-  const resource = new Resource(model, schema)
+  const data = model.slice(0)
+  const resource = new Resource([
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Doe' },
+    { id: 3, name: 'Sally Doe' }
+  ], schema)
 
-  t.same(resource.index().data, model, 'Should list all data')
+  t.same(resource.index().data, data, 'Should list all data')
   t.end()
 })
 
 test('Create new data', t => {
-  const resource = new Resource(model, schema)
+  const resource = new Resource([
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Doe' },
+    { id: 3, name: 'Sally Doe' }
+  ], schema)
 
   const input = { name: 'Foo Bar' }
   const { data } = resource.store(input)
@@ -40,9 +40,16 @@ test('Create new data', t => {
 })
 
 test('Show single data', t => {
-  const resource = new Resource(model, schema)
+  const resource = new Resource([
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Doe' },
+    { id: 3, name: 'Sally Doe' }
+  ], schema)
 
-  t.same(resource.show(1).data, model[0], 'Should returns exact data')
+  t.same(resource.show(1).data, {
+    id: 1,
+    name: 'John Doe'
+  }, 'Should returns exact data')
 
   try {
     resource.show(4)
@@ -54,7 +61,11 @@ test('Show single data', t => {
 })
 
 test('Update existing data data', t => {
-  const resource = new Resource(model, schema)
+  const resource = new Resource([
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Doe' },
+    { id: 3, name: 'Sally Doe' }
+  ], schema)
 
   const input = { name: 'Foo Bar' }
   const { data: updated } = resource.update(2, input)
@@ -78,7 +89,11 @@ test('Update existing data data', t => {
 })
 
 test('Delete data', t => {
-  const resource = new Resource(model, schema)
+  const resource = new Resource([
+    { id: 1, name: 'John Doe' },
+    { id: 2, name: 'Jane Doe' },
+    { id: 3, name: 'Sally Doe' }
+  ], schema)
 
   resource.delete(3)
 
@@ -90,6 +105,19 @@ test('Delete data', t => {
   } catch (err) {
     t.is(err.status, 404, 'Should throw 404 if deleteing non-existing data')
   }
+
+  const softDeletes = new Resource([
+    { id: 1, name: 'John Doe', deleted_at: null }
+  ], {
+    id: { type: 'number', key: true },
+    name: { type: 'text' },
+    deleted_at: { type: 'date' }
+  })
+
+  softDeletes.delete(1)
+
+  t.is(softDeletes.status, 204, 'Should returns 204 if success')
+  t.is(softDeletes.index({ deleted: true }).data.length, 1, 'Should show deleted data count')
 
   t.end()
 })
