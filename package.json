@@ -50,6 +50,8 @@
     "micro": "^9.3.3"
   },
   "devDependencies": {
+    "@types/node": "^10.12.30",
+    "@types/tape": "^4.2.33",
     "faker": "^4.1.0",
     "micro-dev": "^3.0.0",
     "tap-dot": "^2.0.0",
