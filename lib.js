@@ -49,6 +49,16 @@ class Resource {
     return (this.model || []).slice(0)
   }
 
+  get primaryKey () {
+    let primary
+    for (let field in this.schema) {
+      if (this.schema[field].key === true) {
+        primary = field
+      }
+    }
+    return primary
+  }
+
   /**
    * @memberof Resource
    * @param {Object} [input = {}]
@@ -68,6 +78,11 @@ class Resource {
       })
     }
 
+    model.sort(this.sortBy(
+      input.sortBy || this.primaryKey,
+      input.sortDirection || 'desc'
+    ))
+
     if (page < 0 || perPage < 0) {
       return this.serialize(model, {
         page: 0,
@@ -79,7 +94,7 @@ class Resource {
     const start = perPage * (page - 1)
     const sliced = model.slice(start, (perPage * page))
 
-    return this.serialize(sliced, { page, perPage, total: sliced.length })
+    return this.serialize(sliced, { page, perPage, total: model.length })
   }
 
   /**
@@ -192,7 +207,16 @@ class Resource {
    * @return {{data: {Object}}}
    */
   serialize (data, meta = {}) {
+    if (Array.isArray(data)) {
+      if (meta.total === 0) {
+        this.status = 404
+      }
+    }
+
     meta = Object.assign({}, meta, {
+      primary: this.primaryKey,
+      softDelete: this.isSoftDelete,
+      timestamps: this.hasTimestamps,
       field: this.schema
     })
 
@@ -257,6 +281,41 @@ class Resource {
     }
 
     return false
+  }
+
+  sortBy(field, order = 'desc') {
+    const {
+      type
+    } = this.schema[field]
+    const {
+      compareAsc,
+      compareDesc
+    } = require('date-fns')
+    const compare = order === 'asc' ? compareAsc : compareDesc
+
+    return (a, b) => {
+      if (type === 'date') {
+        return compare(a[field], b[field])
+      }
+
+      if (type === 'text') {
+        a = a[field].toUpperCase()
+        b = b[field].toUpperCase()
+        let c = 0
+        if (a > b) {
+          c = 1
+        }
+        if (a < b) {
+          c = -1
+        }
+        return order === 'desc' ? (c * -1) : c
+      }
+
+      a = parseInt(a[field])
+      b = parseInt(b[field])
+
+      return order === 'desc' ? a - b : b - a
+    }
   }
 }
 
@@ -415,7 +474,7 @@ class Database {
           schemas[table][field] = { type: 'number', key: true }
         } else if (/_at$/.test(field)) {
           schemas[table][field] = { type: 'date', time: true }
-        } else if (/^(\d)+$/.test(value)) {
+        } else if (isNumbering(value)) {
           schemas[table][field] = { type: 'number' }
         } else {
           schemas[table][field] = { type: 'text' }
@@ -497,7 +556,23 @@ class RequestParams {
     }
 
     this.method = method.toLowerCase()
-    this.input = Object.assign({}, body, uri.query)
+    this.rawInput = Object.assign({}, body, uri.query)
+  }
+
+  get input () {
+    const input = {}
+
+    for (let [attr, value] of Object.entries(this.rawInput)) {
+      if (['true', 'false', 'yes', 'no', 'y', 'n', 't', 'f'].includes(value.toLowerCase())) {
+        input[attr] = ['true', 'yes', 'y', 't'].includes(value.toLowerCase())
+      } else if (isNumbering(value)) {
+        input[attr] = parseInt(value)
+      } else {
+        input[attr] = value
+      }
+    }
+
+    return input
   }
 
   /**
@@ -593,7 +668,7 @@ class RequestParams {
     const key = this.paths[3]
 
     if (key) {
-      return /^(\d)+$/.test(key) ? parseInt(key) : key
+      return isNumbering(key) ? parseInt(key) : key
     }
 
     return null
@@ -700,6 +775,10 @@ function promisify (cb) {
  */
 function isObject (value) {
   return value !== null && value.constructor.name === 'Object'
+}
+
+function isNumbering (value) {
+  return /^(\d)+$/.test(value)
 }
 
 module.exports = {
