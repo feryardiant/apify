@@ -1,34 +1,18 @@
 const test = require('tape')
-const { Resource, ApifyError } = require('../lib')
+const Resource = require('../lib/resource')
 
-const model = [
-  { id: 1, name: 'John Doe' },
-  { id: 2, name: 'Jane Doe' },
-  { id: 3, name: 'Sally Doe' }
-]
-const schema = {
-  id: { type: 'serial', key: true },
-  name: { type: 'text' }
-}
+const model = require('./normalized')
 
 test('Show all data', t => {
-  const data = model.slice(0)
-  const resource = new Resource([
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Doe' },
-    { id: 3, name: 'Sally Doe' }
-  ], schema)
+  const data = model.albums.data.slice(0)
+  const resource = new Resource(model.albums)
 
   t.same(resource.index().data, data, 'Should list all data')
   t.end()
 })
 
 test('Create new data', t => {
-  const resource = new Resource([
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Doe' },
-    { id: 3, name: 'Sally Doe' }
-  ], schema)
+  const resource = new Resource(model)
 
   const input = { name: 'Foo Bar' }
   const { data } = resource.store(input)
@@ -40,11 +24,7 @@ test('Create new data', t => {
 })
 
 test('Show single data', t => {
-  const resource = new Resource([
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Doe' },
-    { id: 3, name: 'Sally Doe' }
-  ], schema)
+  const resource = new Resource(model)
 
   t.same(resource.show(1).data, {
     id: 1,
@@ -61,11 +41,7 @@ test('Show single data', t => {
 })
 
 test('Update existing data data', t => {
-  const resource = new Resource([
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Doe' },
-    { id: 3, name: 'Sally Doe' }
-  ], schema)
+  const resource = new Resource(model)
 
   const input = { name: 'Foo Bar' }
   const { data: updated } = resource.update(2, input)
@@ -89,11 +65,7 @@ test('Update existing data data', t => {
 })
 
 test('Delete data', t => {
-  const resource = new Resource([
-    { id: 1, name: 'John Doe' },
-    { id: 2, name: 'Jane Doe' },
-    { id: 3, name: 'Sally Doe' }
-  ], schema)
+  const resource = new Resource(model)
 
   resource.delete(3)
 

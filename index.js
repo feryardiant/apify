@@ -1,4 +1,7 @@
-const { Database, Resource, RequestParams, ApifyError } = require('./lib')
+const axios = require('axios')
+
+const { notFound, invalidRequest } = require('./lib/api-error')
+const { parseParam, normalize, Resource } = require('./lib')
 const dryRun = !!process.env.DRY
 const isDev = process.env.NODE_ENV === 'development'
 
@@ -18,13 +21,28 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const params = await RequestParams.parse(req)
-    const db = new Database(params.user, params.repo, params.resource)
+    let rawData
+    const param = await parseParam(req)
+    const cache = `${param.username}-${param.repositry}.apify.json`
 
-    await db.initialize(dryRun, isDev)
+    if (param.internal) {
+      rawData = require('./db.json')
+    } else {
+      if (param.paths.length < 3) {
+        throw invalidRequest()
+      }
+      rawData = await fetch(param.username, param.repositry)
+    }
+
+    const normalized = normalize(rawData)
+
+    if (!normalized[param.resource]) {
+      throw notFound()
+    }
 
     let result
-    const resource = new Resource(db.model.rows, db.model.schemas)
+    console.info(normalized[param.resource])
+    const resource = new Resource(normalized[param.resource])
 
     switch (params.type) {
       case 'index':
@@ -39,12 +57,12 @@ module.exports = async (req, res) => {
       case 'update':
         result = resource.update(params.key, params.input)
         break
-      case 'delete':
-        result = resource.delete(params.key)
+      case 'destroy':
+        result = resource.destroy(params.key)
         break
 
       default:
-        throw ApifyError.invalidRequest('Unsupported request method')
+        throw invalidRequest('Unsupported request method')
         break
     }
 
@@ -60,4 +78,20 @@ module.exports = async (req, res) => {
       trace: isDev ? err.stack.split('\n').map(l => l.trim()) : undefined
     }
   }
+}
+
+/**
+ * @async
+ * @memberof Repository
+ * @param {String} user
+ * @param {String} repo
+ * @return {Object}
+ * @throws {Error}
+ */
+async function fetch (user, repo) {
+  const { data } = await axios.get(`/${user}/${repo}/contents/db.json`, {
+    baseURL: 'https://api.github.com/repos'
+  })
+
+  return Buffer.from(data.content, data.encoding).toString()
 }
