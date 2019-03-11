@@ -1,6 +1,6 @@
 {
   "name": "json-apify",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Zero-config fake REST API server.",
   "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
   "homepage": "https://github.com/feryardiant/apify",
