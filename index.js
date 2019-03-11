@@ -18,6 +18,8 @@ module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE')
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With')
+  res.setHeader('Accept-Charset', 'utf-8')
+  res.setHeader('Accept', 'application/json, application/x-www-form-urlencoded')
   res.setHeader('Allow', 'POST, GET, PUT, DELETE')
 
   if (req.method === 'OPTIONS') {
