@@ -1,5 +1,5 @@
 {
-  "name": "json-apify",
+  "name": "@feryardiant/apify",
   "version": "0.0.4",
   "description": "Zero-config fake REST API server.",
   "author": "Fery Wardiyanto <ferywardiyanto@gmail.com>",
