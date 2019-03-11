@@ -1,8 +1,12 @@
 const axios = require('axios')
+const { existsSync, writeFileSync, readFileSync } = require('fs')
+const { tmpdir } = require('os')
+const { resolve } = require('path')
 
-const { notFound, invalidRequest } = require('./lib/api-error')
-const { parseParam, normalize, Resource } = require('./lib')
-const dryRun = !!process.env.DRY
+const ApiError = require('./lib/api-error')
+const Resource = require('./lib/resource')
+const { parseParam, normalize } = require('./lib')
+const dryRun = process.env.DRY && process.env.DRY == '1'
 const isDev = process.env.NODE_ENV === 'development'
 
 /**
@@ -17,52 +21,63 @@ module.exports = async (req, res) => {
   res.setHeader('Allow', 'POST, GET, PUT, DELETE')
 
   if (req.method === 'OPTIONS') {
-    return { status: 'OK' }
+    return { message: 'OK' }
   }
 
   try {
-    let rawData
+    let result, db = {}
     const param = await parseParam(req)
     const cache = `${param.username}-${param.repositry}.apify.json`
+    const cachePath = resolve(tmpdir(), cache)
 
-    if (param.internal) {
-      rawData = require('./db.json')
+    if (!param.internal && param.paths.length < 3) {
+      throw ApiError.invalidRequest(
+        'Request path should contains /:user/repo/:table.'
+      )
+    }
+
+    if (existsSync(cachePath)) {
+      const cached = readFileSync(cachePath)
+      db.normalized = JSON.parse(cached)
     } else {
-      if (param.paths.length < 3) {
-        throw invalidRequest()
-      }
-      rawData = await fetch(param.username, param.repositry)
+        if (dryRun || param.internal) {
+          db.rawData = require('./db.json')
+        } else {
+          if (param.paths.length < 3) {
+            throw ApiError.invalidRequest()
+          }
+          db.rawData = await fetch(param.username, param.repositry)
+        }
+        db.normalized = normalize(db.rawData)
+
+        writeFileSync(cachePath, JSON.stringify(db.normalized, null, 2))
     }
 
-    const normalized = normalize(rawData)
-
-    if (!normalized[param.resource]) {
-      throw notFound()
+    if (!db.normalized || !db.normalized[param.resource]) {
+      throw ApiError.notFound()
     }
 
-    let result
-    console.info(normalized[param.resource])
-    const resource = new Resource(normalized[param.resource])
+    const resource = new Resource(db.normalized[param.resource])
 
-    switch (params.type) {
+    switch (param.action) {
       case 'index':
-        result = resource.index(params.input)
+        result = resource.index(param.input)
         break
       case 'store':
-        result = resource.store(params.input)
+        result = resource.store(param.input)
         break
       case 'show':
-        result = resource.show(params.key, params.input)
+        result = resource.show(param.key, param.input)
         break
       case 'update':
-        result = resource.update(params.key, params.input)
+        result = resource.update(param.key, param.input)
         break
       case 'destroy':
-        result = resource.destroy(params.key)
+        result = resource.destroy(param.key)
         break
 
       default:
-        throw invalidRequest('Unsupported request method')
+        throw ApiError.invalidRequest('Unsupported request method')
         break
     }
 

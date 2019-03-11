@@ -1,5 +1,5 @@
 const test = require('tape')
-const { normalize } = require('../lib/normalizer')
+const { normalize } = require('../lib')
 
 const rawData = {
   albums: [

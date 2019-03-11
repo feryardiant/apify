@@ -24,7 +24,6 @@ const request = axios.create({
 
 test.skip('Invalid request', t => {
   startService().then(baseURL => {
-    console.log('url', baseURL)
     return request.get('/', { baseURL })
   }).catch(({ response }) => {
     t.is(response.status, 400)

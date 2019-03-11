@@ -71,18 +71,25 @@ As I've already mentioned above this project will have similar response object l
     }
   ],
   "meta": {
-    "page": 1,
-    "perPage": 15,
+    "current_page": 1,
+    "per_page": 15,
     "total": 2,
     "primary": "id",
-    "softDelete": true,
+    "soft_deletes": true,
     "timestamps": true,
-    "field": {
+    "attributes": {
       "id": {
-        "type": "number",
-        "primary": true
+        "key": "id",
+        "label": "ID",
+        "visible": true,
+        "sortable": true,
+        "type": "number"
       },
       "title": {
+        "key": "title",
+        "label": "Title",
+        "visible": true,
+        "sortable": true,
         "type": "text"
       }
     }
@@ -145,7 +152,7 @@ Yes, we'll got extra end-points from  any `Array` or `Object` values, that means
 
 **NOTE:** Unfortunately the relationship functionality is not fully implemented (yet). :sweat_smile:
 
-All end-points suppors `GET`, `POST`, `PUT` and `DELETE`, which is have (almost) the same structure as [laravel resouce controller](https://laravel.com/docs/controllers#resource-controllers). Excepts for `create` and `edit` actions, also no `PATCH`, `HEAD` or `OPTIONS` support yet. Because I don't personally need it, if you ask. :grin:
+All end-points supports `GET`, `POST`, `PUT` and `DELETE`, which is have (almost) the same structure as [laravel resouce controller](https://laravel.com/docs/controllers#resource-controllers). Excepts for `create` and `edit` actions, also no `PATCH`, `HEAD` or `OPTIONS` support yet. Because I don't personally need it, if you ask. :grin:
 
 Also, you might noticed that we convert relation name as is, no plural and singular conversion (yet). So if you have data like this:
 
@@ -166,13 +173,23 @@ Will become something like this:
 ```json
 {
   "people": {
-    "id": 1,
-    "name": "John Doe",
-    "company_id": 1
+    "data": [
+      {
+        "id": 1,
+        "name": "John Doe",
+        "company_id": 1
+      }
+    ],
+    "meta": {}
   },
   "company": {
-    "id": 1,
-    "name": "Acme Inc."
+    "data": [
+      {
+        "id": 1,
+        "name": "Acme Inc."
+      }
+    ],
+    "meta": {}
   }
 }
 ```
@@ -181,25 +198,31 @@ I'll implement this later on, _if needed_
 
 ### Pagination
 
-By default all returned data are paginated 15 data per page and we use `page` and `perPage` query string to do so. Example:
+By default all returned data are paginated 15 rows per page and we use `page` and `per_page` query string to do so. Example:
 
 ```
 /albums?page=2
-/albums?page=2&perPage=15
+/albums?page=2&per_page=15
 ```
 
 **NOTE** Might be changed on future releases
 
 ### Ordering
 
-By default ordering is from on `id` field descending. You're free to change data ordering whatever you like using `orderBy` and `orderDirection` query string. Like this:
+The default ordering is `id, descending`. You're free to change data ordering whatever you like using `sort` key, like this:
 
 ```
-/albums?orderBy=updated_at
-/albums?orderBy=updated_at&orderDirection=asc
+/api/table?sort=id
+// => sort: { id: 'desc' }
+/api/table?sort.id
+// => sort: { id: 'desc' }
+/api/table?sort.id=asc&sort.created_at=asc
+// => sort: { id: 'asc', created_at: 'asc' }
+/api/table?sort[]=id&sort[]=created_at
+// => sort: { id: 'desc', created_at: 'desc' }
+/api/table?sort[]=id&sort.created_at=asc
+// => sort: { id: 'desc', created_at: 'desc' }
 ```
-
-**NOTE** Might be changed on future releases
 
 ### Filtering
 

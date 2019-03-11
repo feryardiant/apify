@@ -34,9 +34,27 @@ test('Parsing internal repository', t => {
 })
 
 test('Parsing query string', t => {
-  const params = parseParam('GET', '/api/table?foo=bar&baz=yes&bang=1')
-
+  let params = parseParam('GET', '/api/table?foo=bar&baz=yes&bang=1')
   t.same(params.input, { foo: 'bar', baz: true, bang: 1 }, 'Should parse query string')
+
+  t.end()
+})
+
+test('Parsing ordering', t => {
+  let params = parseParam('GET', '/api/table?sort.id=asc&sort.created_at=asc')
+  t.same(params.input, { sort: { id: 'asc', created_at: 'asc' } }, 'Should parse object fields')
+
+  params = parseParam('GET', '/api/table?sort[]=id&sort[]=created_at')
+  t.same(params.input, { sort: { id: 'desc', created_at: 'desc' } }, 'Should parse array fields')
+
+  params = parseParam('GET', '/api/table?sort[]=id&sort.created_at=asc')
+  t.same(params.input, { sort: { id: 'desc', created_at: 'asc' } }, 'Should parse mixed fields')
+
+  params = parseParam('GET', '/api/table?sort=id')
+  t.same(params.input, { sort: { id: 'desc' } }, 'Should parse sort string')
+
+  params = parseParam('GET', '/api/table?sort.id')
+  t.same(params.input, { sort: { id: 'desc' } }, 'Should parse null field')
 
   t.end()
 })

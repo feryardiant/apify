@@ -22,13 +22,13 @@ test('util.prmisify', t => {
   promisify(done => {
     done(new Error('Some Error'))
   }).catch(err => {
-    t.same(err.message, 'Some Error')
+    t.is(err.message, 'Some Error')
   })
 
   promisify(done => {
     done(null, 'Some Data')
   }).then(result => {
-    t.same(result, 'Some Data')
+    t.is(result, 'Some Data')
   })
 
   t.end()
