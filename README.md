@@ -101,6 +101,10 @@ The extra properties on `meta` object are simply because my recent front-end pro
 
 **NOTE** Might be changed on future releases
 
+## Request
+
+We only support `application/json` and `application/x-www-form-urlencoded` request `Content-Type`, so make suser you've set one of them on your request header.
+
 ## Routing
 
 Example above will generate 4 end-points
