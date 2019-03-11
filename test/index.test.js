@@ -17,12 +17,15 @@ test.onFinish(() => {
 })
 
 const request = axios.create({
+  headers: {
+    'Content-Type': 'application/json'
+  },
   validateStatus (status) {
     return [200, 201, 204, 304, 404].includes(status)
   }
 })
 
-test.skip('Invalid request', t => {
+test('Invalid request', t => {
   startService().then(baseURL => {
     return request.get('/', { baseURL })
   }).catch(({ response }) => {
