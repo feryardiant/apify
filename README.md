@@ -8,7 +8,7 @@ This project is aims to provide similar [response](https://laravel.com/docs/eloq
 
 ## Limitations
 
-- Since this project hosted on [zeit now](https://zeit.co/pricing) all the limitations of free plan are applied, including 1k invocation / day. So, if you find the project is down, that's might be exceed max invocation.
+- Since this project is hosted on [zeit now](https://zeit.co/pricing) all the limitations of free plan are applied, including 1k invocation / day. So, if you find the project is down, that's might be exceed max invocation.
 
 ## Getting Started
 
