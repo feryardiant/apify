@@ -4,31 +4,31 @@ const axios = require('axios')
 
 const apify = require('../index')
 const db = require('../db.json')
-const url = '/feryardiant/apify'
-let service, baseURL
+let service
 
-function startService() {
+async function startService() {
   service = require('micro')(apify)
-
-  return listen(service)
+  const url = await listen(service)
+  return url
 }
 
 test.onFinish(() => {
-  service.close()
+  if (service) service.close()
 })
 
 const request = axios.create({
-  baseURL,
   validateStatus (status) {
     return [200, 201, 204, 304, 404].includes(status)
   }
 })
 
-test('Invalid request', t => {
+test.skip('Invalid request', t => {
   startService().then(baseURL => {
+    console.log('url', baseURL)
     return request.get('/', { baseURL })
-  }).catch(err => {
-    t.is(err.response.status, 400)
+  }).catch(({ response }) => {
+    t.is(response.status, 400)
+    t.is(response.data.message, 'Request path should contains /:user/repo/:table.')
     t.end()
   })
 })
