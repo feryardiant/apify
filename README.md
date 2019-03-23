@@ -1,4 +1,4 @@
-# Zero-config fake REST API server. [![Travis CI](https://img.shields.io/travis/feryardiant/apify.svg?style=flat-square)](https://travis-ci.org/feryardiant/apify)
+# Zero-config fake REST API server. [![Travis CI](https://img.shields.io/gitlab/pipeline/feryardiant/apify.svg?style=flat-square)](https://travis-ci.org/feryardiant/apify)
 
 Yet another fake REST API server based on my own needs. No config, no option, less foot-print, less dependencies and of course less functionalities, LOL. If you desire mor robust fake REST API server, pleace check typicode@json-server they've done greate job on that project tho.
 

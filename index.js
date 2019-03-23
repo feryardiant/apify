@@ -15,7 +15,7 @@ const isDev = process.env.NODE_ENV === 'development'
  * @param {http.ServerResponse} res
  */
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', req.headers['origin'])
+  res.setHeader('Access-Control-Allow-Origin', req.headers['origin'] || '*')
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Authorization, Access-Control-Allow-Origin')
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   res.setHeader('Accept-Charset', 'utf-8')
