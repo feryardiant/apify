@@ -1,14 +1,15 @@
 # Zero-config fake REST API server. [![Travis CI](https://img.shields.io/gitlab/pipeline/feryardiant/apify.svg?style=flat-square)](https://travis-ci.org/feryardiant/apify)
 
-Yet another fake REST API server based on my own needs. No config, no option, less foot-print, less dependencies and of course less functionalities, LOL. If you desire mor robust fake REST API server, pleace check typicode@json-server they've done greate job on that project tho.
+Yet another fake REST API server-based on my own needs. No config, no option, less foot-print, less dependencies and of course less functionalities, LOL. If you wish more robust fake REST API server, please check [json-server](https://github.com/typicode/json-server) by @typicode they've done great job on that project tho.
 
 Why don't I use that json-server project instead of create my own, if you ask? Because, why not. Obviously. :grin:
 
-This project is aims to provide similar [response](https://laravel.com/docs/eloquent-resources) and [end-points structures](https://laravel.com/docs/controllers#resource-controllers) provided by laravel
+This project is aims to offer similar [response](https://laravel.com/docs/eloquent-resources) and [end-points structures](https://laravel.com/docs/controllers#resource-controllers) provided by laravel
 
 ## Limitations
 
-- Since this project is hosted on [zeit now](https://zeit.co/pricing) all the limitations of free plan are applied, including 1k invocation / day. So, if you find the project is down, that's might be exceed max invocation.
+- This project is hosted on [zeit now](https://zeit.co/pricing)' free plan at the moment. So, all the limitations of free plan are applied, including 1k invocation / day. So, if you find the project is down, that's probably has exceeded max invocation.
+- Only support GitHub repository
 
 ## Getting Started
 
@@ -234,7 +235,7 @@ The default ordering is `id, descending`. You're free to change data ordering wh
 
 ## Credits
 
-- typicode@json-server
+- [json-server](https://github.com/typicode/json-server) by @typicode
 
 ## License
 
