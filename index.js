@@ -9,6 +9,8 @@ const { parseParam, normalize } = require('./lib')
 const dryRun = process.env.DRY && process.env.DRY == '1'
 const isDev = process.env.NODE_ENV === 'development'
 
+const allowedMethods = ['POST', 'GET', 'PUT', 'OPTIONS', 'DELETE']
+
 /**
  * @async
  * @param {http.IncomingMessage} req
@@ -24,8 +26,8 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') {
     // res.setHeader('Accept', 'application/json, application/x-www-form-urlencoded')
     res.setHeader('Access-Control-Max-Age', '86400')
-    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, PUT, OPTIONS, DELETE')
-    res.setHeader('Allow', 'POST, GET, PUT, OPTIONS, DELETE')
+    res.setHeader('Access-Control-Allow-Methods', allowedMethods.join(', '))
+    res.setHeader('Allow', allowedMethods.join(', '))
   }
 
   try {
@@ -81,7 +83,7 @@ module.exports = async (req, res) => {
         break
 
       default:
-        throw ApiError.invalidRequest('Unsupported request method')
+        throw ApiError.methodNotAllowed()
         break
     }
 
