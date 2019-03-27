@@ -31,6 +31,10 @@ module.exports = async (req, res) => {
   }
 
   try {
+    if (!allowedMethods.includes(req.method)) {
+      throw ApiError.methodNotAllowed()
+    }
+
     let result, db = {}
     const param = await parseParam(req)
     const cache = `${param.username}-${param.repositry}.apify.json`
