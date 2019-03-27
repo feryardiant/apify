@@ -21,3 +21,14 @@ test('Method not alowed', t => {
     t.end()
   })
 })
+
+test('Resource not found', t => {
+  start(test).then(baseURL => {
+    return request.get('/api/foobar', { baseURL })
+  }).catch(({ response }) => {
+    t.is(response.status, 404)
+    t.is(response.data.message, 'Resource not found')
+
+    t.end()
+  })
+})

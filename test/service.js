@@ -2,7 +2,7 @@ const listen = require('test-listen')
 const axios = require('axios')
 
 const apify = require('../index')
-const validStatus = [200, 201, 204, 304, 404]
+const validStatus = [200, 201, 204, 304]
 
 const axiosOption = {
   headers: {
