@@ -6,7 +6,7 @@ const validStatus = [200, 201, 204, 304]
 
 const axiosOption = {
   headers: {
-    commons: {
+    common: {
       'Content-Type': 'application/json'
     }
   },
@@ -17,14 +17,20 @@ const axiosOption = {
 
 exports.request = axios.create(axiosOption)
 
-exports.start = (test) => {
+exports.start = async (test, cb) => {
   const service = require('micro')(apify)
 
   test.onFinish(() => {
     service.close()
   })
 
-  return listen(service)
+  const url = await listen(service)
+
+  if (typeof cb === 'function') {
+    return cb(url)
+  }
+
+  return url
 }
 
 exports.validStatus = validStatus
