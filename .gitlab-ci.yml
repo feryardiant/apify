@@ -11,16 +11,16 @@ node:10:
   image: node:10
   stage: test
   before_script:
-    - npm -g install npm@latest
-    - npm ci
+    - npm -g install yarn@latest
+    - yarn
   script:
-    - npm test
+    - yarn test
 
 node:12:
   image: node:12
   stage: test
   before_script:
-    - npm -g install npm@latest
-    - npm ci
+    - npm -g install yarn@latest
+    - yarn
   script:
-    - npm test
+    - yarn test
