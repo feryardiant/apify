@@ -52,7 +52,7 @@
     "qs": "^6.6.0"
   },
   "devDependencies": {
-    "@types/node": "^12.7.3",
+    "@types/node": "^14.0.13",
     "@types/tape": "^4.2.33",
     "faker": "^4.1.0",
     "micro-dev": "^3.0.0",
