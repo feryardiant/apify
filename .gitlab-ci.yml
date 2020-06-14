@@ -7,18 +7,20 @@ cache:
   paths:
     - node_modules/
 
-node:10.15:
-  image: node:10.15
+node:10:
+  image: node:10
   stage: test
   before_script:
+    - npm -g install npm@latest
     - npm ci
   script:
     - npm test
 
-node:8.15:
-  image: node:8.15
+node:12:
+  image: node:12
   stage: test
   before_script:
+    - npm -g install npm@latest
     - npm ci
   script:
     - npm test
