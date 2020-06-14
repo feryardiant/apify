@@ -1,9 +1,8 @@
 {
-  "name": "apify",
   "alias": ["apify"],
   "version": 2,
   "builds": [
-    { "src": "index.js", "use": "now-micro" }
+    { "src": "index.js", "use": "@now/node" }
   ],
   "routes": [
     { "src": "/favicon.ico", "status": 404 },
