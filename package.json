@@ -46,7 +46,7 @@
     "url": "https://github.com/feryardiant/apify/issues"
   },
   "dependencies": {
-    "axios": "^0.19",
+    "axios": "^0.20",
     "date-fns": "^2.0",
     "micro": "^9.3",
     "qs": "^6.6"
