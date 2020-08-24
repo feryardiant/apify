@@ -649,10 +649,10 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
-faker@^4.1:
-  version "4.1.0"
-  resolved "https://registry.npmjs.org/faker/-/faker-4.1.0.tgz#1e45bbbecc6774b3c195fad2835109c6d748cc3f"
-  integrity sha1-HkW7vsxndLPBlfrSg1EJxtdIzD8=
+faker@^5.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/faker/-/faker-5.0.0.tgz#ceaf8120e37994007d6fb0e73479bef0406bfe74"
+  integrity sha512-wBY77PYhJOqq2cji+l8Gc8HWW7rKlwJvJgV/fbanGlm92/MImBGX51VLQN/DbDvzexmt+EFjQ4SeytCb45AJ1g==
 
 file-uri-to-path@1.0.0:
   version "1.0.0"
