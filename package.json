@@ -54,7 +54,7 @@
   "devDependencies": {
     "@types/node": "^12.7",
     "@types/tape": "^4.2",
-    "faker": "^4.1",
+    "faker": "^5.1",
     "micro-dev": "^3.0",
     "tap-dot": "^2.0",
     "tape": "^4.10",
