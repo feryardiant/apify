@@ -376,9 +376,9 @@ css-what@2.1:
   integrity sha512-a+EPoD+uZiNfh+5fxw2nO9QwFa6nJe2Or35fGY6Ipw1R3R4AGz1d1TEZrCegvw2YTmZ0jXirGYlzxxpYSHwpEg==
 
 date-fns@^2.0:
-  version "2.16.1"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.16.1.tgz#05775792c3f3331da812af253e1a935851d3834b"
-  integrity sha512-sAJVKx/FqrLYHAQeN7VpJrPhagZc9R4ImZIWYRFZaaohR3KzmuK88touwsSwSVT8Qcbd4zoDsnGfX4GFB4imyQ==
+  version "2.18.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.18.0.tgz#08e50aee300ad0d2c5e054e3f0d10d8f9cdfe09e"
+  integrity sha512-NYyAg4wRmGVU4miKq5ivRACOODdZRY3q5WLmOJSq8djyzftYphU7dTHLcEtLqEvfqMKQ0jVv91P4BAwIjsXIcw==
 
 debounce@1.1.0:
   version "1.1.0"
