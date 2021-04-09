@@ -18,17 +18,17 @@ test('util.isNumber', t => {
   t.end()
 })
 
-test('util.prmisify', t => {
-  promisify(done => {
+test('util.prmisify', async t => {
+  await promisify(done => {
     done(new Error('Some Error'))
   }).catch(err => {
-    t.is(err.message, 'Some Error')
+    t.strictEquals(err.message, 'Some Error')
   })
 
-  promisify(done => {
+  await promisify(done => {
     done(null, 'Some Data')
   }).then(result => {
-    t.is(result, 'Some Data')
+    t.strictEquals(result, 'Some Data')
   })
 
   t.end()
