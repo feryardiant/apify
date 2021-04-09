@@ -46,18 +46,18 @@
     "url": "https://github.com/feryardiant/apify/issues"
   },
   "dependencies": {
-    "axios": "^0.19",
-    "date-fns": "^2.0",
+    "axios": "^0.21",
+    "date-fns": "^2.20",
     "micro": "^9.3",
-    "qs": "^6.6"
+    "qs": "^6.10"
   },
   "devDependencies": {
-    "@types/node": "^12.7",
+    "@types/node": "^14.14",
     "@types/tape": "^4.2",
-    "faker": "^4.1",
+    "faker": "^5.5",
     "micro-dev": "^3.0",
     "tap-dot": "^2.0",
-    "tape": "^4.10",
+    "tape": "^5.2",
     "test-listen": "^1.1"
   }
 }
