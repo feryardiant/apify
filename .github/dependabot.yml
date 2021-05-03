@@ -1,0 +1,26 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: monthly
+    time: "22:00"
+    timezone: Asia/Jakarta
+  open-pull-requests-limit: 10
+  versioning-strategy: lockfile-only
+  ignore:
+  - dependency-name: "@types/node"
+    versions:
+    - ">= 13.a, < 14"
+  - dependency-name: faker
+    versions:
+    - 5.5.2
+  - dependency-name: qs
+    versions:
+    - 6.10.1
+  - dependency-name: date-fns
+    versions:
+    - 2.19.0
+  - dependency-name: "@types/node"
+    versions:
+    - 12.20.7
