@@ -1,6 +1,6 @@
-# Zero-config fake REST API server. [![Travis CI](https://img.shields.io/gitlab/pipeline/feryardiant/apify.svg?style=flat-square)](https://travis-ci.org/feryardiant/apify)
+# Zero-config fake REST API server.
 
-Yet another fake REST API server-based on my own needs. No config, no option, less foot-print, less dependencies and of course less functionalities, LOL. If you wish more robust fake REST API server, please check [json-server](https://github.com/typicode/json-server) by @typicode they've done great job on that project tho.
+Yet another fake REST API server-based on my own needs. No config, no option, less foot-print, less dependencies and of course less functionalities, LOL. If you wish more robust fake REST API server, please check [json-server](https://github.com/typicode/json-server) by @typicode they've done great job on that project though.
 
 Why don't I use that json-server project instead of create my own, if you ask? Because, why not. Obviously. :grin:
 
@@ -8,12 +8,12 @@ This project is aims to offer similar [response](https://laravel.com/docs/eloque
 
 ## Limitations
 
-- This project is hosted on [zeit now](https://zeit.co/pricing)' free plan at the moment. So, all the limitations of free plan are applied, including 1k invocation / day. So, if you find the project is down, that's probably has exceeded max invocation.
-- Only support GitHub repository
+- This project is hosted on [vercel](http://vercel.com)' free plan at the moment. So, all the limitations of free plan are applied, including 1k invocation / day. So, if you find the project is down, that's probably has exceeded max invocation.
+- Only supports GitHub repositories
 
 ## Getting Started
 
-Create `db.json` file with some data
+All you need to do is creating file called `.apify.json` in your root project. Example:
 
 ```json
 {
@@ -45,13 +45,13 @@ Create `db.json` file with some data
 }
 ```
 
-Put that file into root directory of your public project on GitHub and visit:
+Don't forget to commit and push to your github repository, done? now you can access your _fake_ api through URL below:
 
 ```
-http://apify.now.sh/:username/:reponame/:table
+http://apify.vercel.com/:username/:reponame/:table
 ```
 
-The `:table` is either `posts`, `albums` or `users` from your `db.json` file.
+The `:table` is either `posts`, `albums` or `users` from your `.apify.json` file.
 
 That's it 🍻
 
