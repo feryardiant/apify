@@ -14,6 +14,7 @@
     "*.js",
     "db.json"
   ],
+  "types": "types.d.ts",
   "keywords": [
     "JSON",
     "server",
@@ -32,11 +33,11 @@
   ],
   "scripts": {
     "start": "micro",
-    "serve": "micro-dev",
-    "test": "tape test/*.test.js | tap-dot"
+    "serve": "vercel dev",
+    "test": "tape -r ts-node/register test/*.test.ts | tap-dot"
   },
   "engines": {
-    "node": ">=10.15"
+    "node": "14.x || 16.x"
   },
   "repository": {
     "type": "git",
@@ -46,18 +47,20 @@
     "url": "https://github.com/feryardiant/apify/issues"
   },
   "dependencies": {
+    "@vercel/node": "^1.12.1",
     "axios": "^0.24",
     "date-fns": "^2.20",
-    "micro": "^9.3",
     "qs": "^6.10"
   },
   "devDependencies": {
+    "@types/faker": "^5.5.9",
     "@types/node": "^14.14",
     "@types/tape": "^4.2",
     "faker": "^5.5",
-    "micro-dev": "^3.0",
     "tap-dot": "^2.0",
     "tape": "^5.2",
-    "test-listen": "^1.1"
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2",
+    "vercel": "^23.1.2"
   }
 }

@@ -7,16 +7,16 @@ cache:
   paths:
     - node_modules/
 
-node:10:
-  image: node:10
+node:14:
+  image: node:14
   stage: test
   before_script:
     - yarn
   script:
     - yarn test
 
-node:12:
-  image: node:12
+node:16:
+  image: node:16
   stage: test
   before_script:
     - yarn

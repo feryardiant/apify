@@ -1,5 +1,5 @@
-const faker = require('faker')
-const fs = require('fs')
+import faker from 'faker'
+import fs from 'fs'
 
 const faked = {
   albums: [],
@@ -9,7 +9,7 @@ const faked = {
   users: [],
 }
 
-let created
+let created: Date
 const now = new Date()
 const users = []
 
@@ -112,4 +112,4 @@ for (let i = 1; i <= 60; i++) {
   })
 }
 
-fs.writeFileSync('db.json', JSON.stringify(faked, null, 2))
+fs.writeFileSync('.apify.json', JSON.stringify(faked, null, 2))

@@ -1,11 +1,12 @@
 {
   "alias": ["apify"],
-  "version": 2,
-  "builds": [
-    { "src": "index.js", "use": "@now/node" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index" }
   ],
-  "routes": [
-    { "src": "/favicon.ico", "status": 404 },
-    { "src": "/(.*)", "dest": "/index.js" }
-  ]
+  "cleanUrls": true,
+  "functions": {
+    "api/index.ts": {
+      "includeFiles": "./lib/*.ts"
+    }
+  }
 }

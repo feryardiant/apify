@@ -13,10 +13,8 @@ Icon?
 
 # IDE Project Configurations
 # --------------------------
-/.idea
-/.settings
-/.vscode
-.project
+.vscode
+.vercel
 *.sublime-*
 *.suo
 *.ntvs*
