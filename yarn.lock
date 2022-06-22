@@ -1016,7 +1016,7 @@ get-symbol-description@^1.0.0:
     call-bind "^1.0.2"
     get-intrinsic "^1.1.1"
 
-glob@^7.1.3:
+glob@^7.1.3, glob@^7.2.0:
   version "7.2.3"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.3.tgz#b8df0fb802bbfa8e89bd1d938b4e16578ed44f2b"
   integrity sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==
@@ -1025,18 +1025,6 @@ glob@^7.1.3:
     inflight "^1.0.4"
     inherits "2"
     minimatch "^3.1.1"
-    once "^1.3.0"
-    path-is-absolute "^1.0.0"
-
-glob@^7.2.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/glob/-/glob-7.2.0.tgz#d15535af7732e02e948f4c41628bd910293f6023"
-  integrity sha512-lmLf6gtyrPq8tTjSmrO94wBeQbFR3HbLHbuyD69wuyQkImp2hWqMGB47OX65FBkPffO641IP9jWa1z4ivqG26Q==
-  dependencies:
-    fs.realpath "^1.0.0"
-    inflight "^1.0.4"
-    inherits "2"
-    minimatch "^3.0.4"
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
@@ -1520,12 +1508,7 @@ minimatch@^3.0.4, minimatch@^3.1.1:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimist@^1.2.0, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
-
-minimist@^1.2.6:
+minimist@^1.2.0, minimist@^1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
   integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
@@ -2180,9 +2163,9 @@ tap-out@^1.3.2:
     trim "0.0.1"
 
 tape@^5.2:
-  version "5.5.2"
-  resolved "https://registry.yarnpkg.com/tape/-/tape-5.5.2.tgz#3750c415e6ddfbcd425945f02f1a907d2ea8171f"
-  integrity sha512-N9Ss672dFE3QlppiXGh2ieux8Ophau/HSAQguW5cXQworKxV0QvnZCYI35W1OYySTJk0OC9OPuS+0xNO6lhiTQ==
+  version "5.5.3"
+  resolved "https://registry.yarnpkg.com/tape/-/tape-5.5.3.tgz#b6d6f3c99a7bade12b9dcf6ee2234b1dd35e5003"
+  integrity sha512-hPBJZBL9S7bH9vECg/KSM24slGYV589jJr4dmtiJrLD71AL66+8o4b9HdZazXZyvnilqA7eE8z5/flKiy0KsBg==
   dependencies:
     array.prototype.every "^1.1.3"
     call-bind "^1.0.2"
@@ -2196,7 +2179,7 @@ tape@^5.2:
     has-dynamic-import "^2.0.1"
     inherits "^2.0.4"
     is-regex "^1.1.4"
-    minimist "^1.2.5"
+    minimist "^1.2.6"
     object-inspect "^1.12.0"
     object-is "^1.1.5"
     object-keys "^1.1.1"
