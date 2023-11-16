@@ -6,7 +6,7 @@
   "homepage": "https://github.com/feryardiant/apify",
   "license": "MIT",
   "packageManager": "pnpm@8.10.0",
-  "types": "types.d.ts",
+  "type": "module",
   "keywords": [
     "JSON",
     "server",
