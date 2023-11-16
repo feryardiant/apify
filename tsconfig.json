@@ -1,19 +1,17 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "module": "esnext",
+    "target": "esnext",
+    "declaration": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "lib": [
-      "ESNext"
-    ],
-    "types": [
-      "./types"
-    ],
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "lib": ["ESNext"],
     "typeRoots": [
       "./node_modules/@types"
     ]
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
