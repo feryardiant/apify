@@ -24,7 +24,6 @@
     "sandbox"
   ],
   "scripts": {
-    "start": "micro",
     "serve": "vercel dev",
     "test": "tape -r ts-node/register test/*.test.ts | tap-dot"
   },
