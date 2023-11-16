@@ -1,7 +1,7 @@
 import { writeFile } from 'fs/promises'
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import axios from 'axios'
-import { isObject, isNumber, loadCache } from '../utils'
+import { isObject, isNumber, loadCache } from '../utils/index'
 
 const allowedMethods = ['POST', 'GET', 'PUT', 'OPTIONS', 'DELETE']
 const allowedTypes = [
