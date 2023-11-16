@@ -1,12 +1,12 @@
 {
   "alias": ["apify"],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
+    { "source": "/(.*)", "destination": "/src/api.ts" }
   ],
   "cleanUrls": true,
   "functions": {
-    "api/index.ts": {
-      "includeFiles": "./lib/*.ts"
+    "src/api.ts": {
+      "includeFiles": "./src/utils/*.ts"
     }
   }
 }
