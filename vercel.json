@@ -1,8 +1,5 @@
 {
   "alias": ["apify"],
-  "builds": [
-    { "src": "/api/index.ts", "use": "@vercel/node" }
-  ],
   "routes": [
     { "src": "/(.*)", "dest": "/api/index" }
   ],
