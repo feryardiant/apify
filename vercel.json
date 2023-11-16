@@ -6,7 +6,7 @@
   "cleanUrls": true,
   "functions": {
     "api/index.ts": {
-      "includeFiles": "./lib/*.ts"
+      "includeFiles": "./api/utils/*.ts"
     }
   }
 }
