@@ -1,7 +1,11 @@
 {
+  "vesion": 2,
   "alias": ["apify"],
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index" }
+  "builds": [
+    { "src": "/api/index.ts", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/api/index" }
   ],
   "cleanUrls": true,
   "functions": {
