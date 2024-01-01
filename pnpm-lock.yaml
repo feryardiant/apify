@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@vercel/node':
     specifier: ^3.0.11
-    version: 3.0.11
+    version: 3.0.14
   axios:
     specifier: ^1.6.2
     version: 1.6.2
@@ -216,6 +216,11 @@ packages:
 
   /@vercel/build-utils@7.2.5:
     resolution: {integrity: sha512-rlXL7Kjwfl8c8CQ9fYpP/+AunFZbaXXf89OT+7G8E/CGRM+hAYrGF+N3Kz1X8TfwfNlSCqPs7VQriOKKajUS0g==}
+    dev: true
+
+  /@vercel/build-utils@7.4.1:
+    resolution: {integrity: sha512-Tg35Zl3r68h/Tg4TVb+gIVUKGsL5XVbtSI7gUYNZyq/811CVX7zlCV5ZHAmEkG7J5+nBoaUJc/eoYP6HkzcNIg==}
+    dev: false
 
   /@vercel/error-utils@2.0.2:
     resolution: {integrity: sha512-Sj0LFafGpYr6pfCqrQ82X6ukRl5qpmVrHM/191kNYFqkkB9YkjlMAj6QcEsvCG259x4QZ7Tya++0AB85NDPbKQ==}
@@ -333,6 +338,36 @@ packages:
       - '@swc/wasm'
       - encoding
       - supports-color
+    dev: true
+
+  /@vercel/node@3.0.14:
+    resolution: {integrity: sha512-bgnal1ukp8+zszzY7T9ng4Ui3D7EXuIgvVUh1hbfeHcytOSwn8FYVLiuUuy8mnLkESaZaBejnZ22LCsVItNyag==}
+    dependencies:
+      '@edge-runtime/node-utils': 2.2.1
+      '@edge-runtime/primitives': 4.0.5
+      '@edge-runtime/vm': 3.1.7
+      '@types/node': 14.18.33
+      '@vercel/build-utils': 7.4.1
+      '@vercel/error-utils': 2.0.2
+      '@vercel/nft': 0.24.2
+      '@vercel/static-config': 3.0.0
+      async-listen: 3.0.0
+      edge-runtime: 2.5.7
+      esbuild: 0.14.47
+      etag: 1.8.1
+      exit-hook: 2.2.1
+      node-fetch: 2.6.9
+      path-to-regexp: 6.2.1
+      ts-morph: 12.0.0
+      ts-node: 10.9.1(@types/node@14.18.33)(typescript@4.9.5)
+      typescript: 4.9.5
+      undici: 5.26.5
+    transitivePeerDependencies:
+      - '@swc/core'
+      - '@swc/wasm'
+      - encoding
+      - supports-color
+    dev: false
 
   /@vercel/python@4.1.0:
     resolution: {integrity: sha512-EIQXK5zL6fce0Barh74gc7xyLtRyvgmLZDIVQ8yJLtFxPlPCRY3GXkdJ7Jdcw8Pd0uuVF0vIHatv18xSLbcwtg==}
