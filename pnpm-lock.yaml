@@ -33,7 +33,7 @@ devDependencies:
     version: 2.0.0
   tape:
     specifier: ^5.7.2
-    version: 5.7.2
+    version: 5.7.4
   ts-node:
     specifier: ^10.9.1
     version: 10.9.1(@types/node@18.19.0)(typescript@4.9.5)
@@ -700,7 +700,7 @@ packages:
       isarray: 2.0.5
       object-is: 1.1.5
       object-keys: 1.1.1
-      object.assign: 4.1.4
+      object.assign: 4.1.5
       regexp.prototype.flags: 1.5.1
       side-channel: 1.0.4
       which-boxed-primitive: 1.0.2
@@ -817,7 +817,7 @@ packages:
       is-weakref: 1.0.2
       object-inspect: 1.13.1
       object-keys: 1.1.1
-      object.assign: 4.1.4
+      object.assign: 4.1.5
       regexp.prototype.flags: 1.5.1
       safe-array-concat: 1.0.1
       safe-regex-test: 1.0.0
@@ -1304,8 +1304,9 @@ packages:
     resolution: {integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==}
     dev: true
 
-  /has-dynamic-import@2.0.1:
-    resolution: {integrity: sha512-X3fbtsZmwb6W7fJGR9o7x65fZoodygCrZ3TVycvghP62yYQfS0t4RS0Qcz+j5tQYUKeSWS09tHkWW6WhFV3XhQ==}
+  /has-dynamic-import@2.1.0:
+    resolution: {integrity: sha512-su0anMkNEnJKZ/rB99jn3y6lV/J8Ro96hBJ28YAeVzj5rWxH+YL/AdCyiYYA1HDLV9YhmvqpWSJJj2KLo1MX6g==}
+    engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.5
       get-intrinsic: 1.2.2
@@ -1817,8 +1818,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /object.assign@4.1.4:
-    resolution: {integrity: sha512-1mxKf0e58bvyjSCtKYY4sRe9itRk3PJpquJOjeIkz885CczcI4IvJJDLPS72oowuSh+pBxUFROpX+TU++hxhZQ==}
+  /object.assign@4.1.5:
+    resolution: {integrity: sha512-byy+U7gp+FVwmyzKPYhW2h5l3crpmGsxl7X2s8y43IgxvG4g3QZ6CffDtsNQy1WsmZpQbO+ybo0AlW7TY6DcBQ==}
     engines: {node: '>= 0.4'}
     dependencies:
       call-bind: 1.0.5
@@ -2258,8 +2259,8 @@ packages:
       trim: 0.0.1
     dev: true
 
-  /tape@5.7.2:
-    resolution: {integrity: sha512-cvSyprYahyOYXbtBwV/B7nrx7kINeZ3VZ9fKoSywoPwZN3oQ1WVLvt+Vl0XCz/gi37CDrY3dlW790nzviIzoPw==}
+  /tape@5.7.4:
+    resolution: {integrity: sha512-uaigP+5H9+E8aaMLKMbGkDd33G5TKu4UFpapqT7um+8xSHQQUS2lJNd+hTj9fFVQLg8bmcIofwc8b9f6+ISSfQ==}
     hasBin: true
     dependencies:
       '@ljharb/resumer': 0.0.1
@@ -2272,7 +2273,7 @@ packages:
       for-each: 0.3.3
       get-package-type: 0.1.0
       glob: 7.2.3
-      has-dynamic-import: 2.0.1
+      has-dynamic-import: 2.1.0
       hasown: 2.0.0
       inherits: 2.0.4
       is-regex: 1.1.4
@@ -2281,7 +2282,7 @@ packages:
       object-inspect: 1.13.1
       object-is: 1.1.5
       object-keys: 1.1.1
-      object.assign: 4.1.4
+      object.assign: 4.1.5
       resolve: 2.0.0-next.5
       string.prototype.trim: 1.2.8
     dev: true
