@@ -7,7 +7,7 @@ settings:
 dependencies:
   '@vercel/node':
     specifier: ^3.0.11
-    version: 3.0.24
+    version: 3.0.28
   axios:
     specifier: ^1.6.2
     version: 1.6.2
@@ -252,8 +252,8 @@ packages:
     resolution: {integrity: sha512-RJwqrGYSk75auHZqWmlSL+a5JsWv+4SF1AxNQJ+KpF3XWZ/8yThkN/jHBfNxMmW6VvNczSVtMaXI0/2Sess6Eg==}
     dev: true
 
-  /@vercel/build-utils@7.9.1:
-    resolution: {integrity: sha512-yqbP7d8oLAGkh5iy9/Vu1c0+s5jLFK56QHEZlkj1lY3t3OQ+7dsAi0oUP/gv8YxtUYwMDfeYSqZr/4cNhnSBsg==}
+  /@vercel/build-utils@8.0.0:
+    resolution: {integrity: sha512-6vOiAVFA/Uu4+uV3f751rcXgfKVHrgBQFKXwvPTczl1q0djvCHsQDngl1ccu1NSyWSzdem3YhhDkLOUMHLN3xA==}
     dev: false
 
   /@vercel/error-utils@2.0.2:
@@ -397,14 +397,14 @@ packages:
       - supports-color
     dev: true
 
-  /@vercel/node@3.0.24:
-    resolution: {integrity: sha512-2EbC6zsoaj2HH97BZYdkqHNeQ3gpcsETHXySSslkylU1uTAZU5i4c+Ze+RIinVkk7P+DVv4XzDK6xaSHvkXkGA==}
+  /@vercel/node@3.0.28:
+    resolution: {integrity: sha512-GQggDgsBgSJLDPlkddmSPOgfvrgRlxnQzhae64b21X0C5GHRmN8c1p5qVghjeNft8cIEIBETVOnSe8eBvqWYxQ==}
     dependencies:
       '@edge-runtime/node-utils': 2.3.0
       '@edge-runtime/primitives': 4.1.0
       '@edge-runtime/vm': 3.2.0
       '@types/node': 14.18.33
-      '@vercel/build-utils': 7.9.1
+      '@vercel/build-utils': 8.0.0
       '@vercel/error-utils': 2.0.2
       '@vercel/nft': 0.26.4
       '@vercel/static-config': 3.0.0
