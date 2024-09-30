@@ -19,15 +19,15 @@ dependencies:
     version: 6.13.0
 
 devDependencies:
+  '@faker-js/faker':
+    specifier: ^9.0.3
+    version: 9.0.3
   '@types/node':
     specifier: ^18.19.54
     version: 18.19.54
   '@types/tape':
     specifier: ^5.6.4
     version: 5.6.4
-  faker:
-    specifier: 6.6.6
-    version: 6.6.6
   tap-dot:
     specifier: ^2.0.0
     version: 2.0.0
@@ -80,6 +80,11 @@ packages:
     engines: {node: '>=16'}
     dependencies:
       '@edge-runtime/primitives': 4.1.0
+
+  /@faker-js/faker@9.0.3:
+    resolution: {integrity: sha512-lWrrK4QNlFSU+13PL9jMbMKLJYXDFu3tQfayBsMXX7KL/GiQeqfB1CzHkqD5UHBUtPAuPo6XwGbMFNdVMZObRA==}
+    engines: {node: '>=18.0.0', npm: '>=9.0.0'}
+    dev: true
 
   /@fastify/busboy@2.1.1:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
@@ -1156,10 +1161,6 @@ packages:
       p-finally: 2.0.1
       signal-exit: 3.0.7
       strip-final-newline: 2.0.0
-    dev: true
-
-  /faker@6.6.6:
-    resolution: {integrity: sha512-9tCqYEDHI5RYFQigXFwF1hnCwcWCOJl/hmll0lr5D2Ljjb0o4wphb69wikeJDz5qCEzXCoPvG6ss5SDP6IfOdg==}
     dev: true
 
   /fast-deep-equal@3.1.3:

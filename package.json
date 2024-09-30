@@ -41,9 +41,9 @@
     "qs": "^6.13.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.0.3",
     "@types/node": "^18.19.54",
     "@types/tape": "^5.6.4",
-    "faker": "6.6.6",
     "tap-dot": "^2.0.0",
     "tape": "^5.9.0",
     "ts-node": "^10.9.2",

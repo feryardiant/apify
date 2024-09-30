@@ -1,4 +1,4 @@
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import fs from 'fs'
 
 const faked = {
@@ -20,11 +20,14 @@ for (let i = 1; i <= 30; i++) {
     id: i,
     username: faker.internet.userName(),
     email: faker.internet.exampleEmail().toLowerCase(),
-    avatar: faker.internet.avatar(),
+    avatar: faker.image.avatar(),
     deleted_at: null,
     created_at: created,
     active_at: created,
-    updated_at: faker.date.between(created, now),
+    updated_at: faker.date.between({
+      from: created,
+      to: now
+    }),
   })
 }
 
@@ -32,12 +35,13 @@ const albumTags = ['business', 'animals', 'city', 'food', 'nature']
 
 for (let i = 1; i <= 60; i++) {
   created = faker.date.past()
-  const updated = faker.date.between(created, now)
-  const tag = faker.random.arrayElement(albumTags)
+  const updated = faker.date.between({ from: created, to: now })
+
+  const tag = faker.helpers.arrayElement(albumTags)
   const images = []
   const length = [6, 9, 12, 15]
 
-  for (let n = 1; n <= faker.random.arrayElement(length); n++) {
+  for (let n = 1; n <= faker.helpers.arrayElement(length); n++) {
     images.push({
       image: faker.image[tag]()
     })
@@ -45,7 +49,7 @@ for (let i = 1; i <= 60; i++) {
 
   faked.albums.push({
     id: i,
-    users_id: faker.random.arrayElement(users),
+    users_id: faker.helpers.arrayElement(users),
     thumbnail: faker.image[tag](400, 400),
     images: images,
     tag: tag,
@@ -59,9 +63,9 @@ const companies = []
 
 for (let i = 1; i <= 20; i++) {
   companies.push({
-    name: faker.company.companyName(),
-    address: faker.address.streetAddress(),
-    phone: faker.phone.phoneNumber('(###) ###-####'),
+    name: faker.company.name(),
+    address: faker.location.streetAddress(),
+    phone: faker.phone.number({ style: 'national' }),
     email: faker.internet.exampleEmail().toLowerCase()
   })
 }
@@ -70,15 +74,15 @@ for (let i = 1; i <= 40; i++) {
   created = faker.date.past()
   faked.people.push({
     id: i,
-    users_id: faker.random.arrayElement(users),
-    name: faker.name.findName(),
-    address: faker.address.streetAddress(),
-    phone: faker.phone.phoneNumber('(###) ###-####'),
+    users_id: faker.helpers.arrayElement(users),
+    name: faker.person.fullName(),
+    address: faker.location.streetAddress(),
+    phone: faker.phone.number({ style: 'national' }),
     email: faker.internet.exampleEmail().toLowerCase(),
-    company: faker.random.arrayElement(companies),
+    company: faker.helpers.arrayElement(companies),
     deleted_at: null,
     created_at: created,
-    updated_at: faker.date.between(created, now),
+    updated_at: faker.date.between({ from: created, to: now }),
   })
 }
 
@@ -87,14 +91,14 @@ for (let i = 1; i <= 60; i++) {
   const title = faker.lorem.words(6)
   faked.posts.push({
     id: i,
-    users_id: faker.random.arrayElement(users),
+    users_id: faker.helpers.arrayElement(users),
     title: title,
     slug: faker.helpers.slugify(title),
     contents: faker.lorem.paragraphs(),
-    thumbnail: faker.image.imageUrl(400, 400),
+    thumbnail: faker.image.url({ width: 400, height: 400 }),
     deleted_at: null,
     created_at: created,
-    updated_at: faker.date.between(created, now),
+    updated_at: faker.date.between({ from: created, to: now }),
   })
 }
 
@@ -102,13 +106,13 @@ for (let i = 1; i <= 60; i++) {
   created = faker.date.past()
   faked.products.push({
     id: i,
-    users_id: faker.random.arrayElement(users),
+    users_id: faker.helpers.arrayElement(users),
     name: faker.commerce.productName(),
-    price: parseFloat(faker.commerce.price(100, 500)),
-    thumbnail: faker.image.imageUrl(400, 400),
+    price: parseFloat(faker.commerce.price({ min: 100, max: 500 })),
+    thumbnail: faker.image.url({ width: 400, height: 400 }),
     deleted_at: null,
     created_at: created,
-    updated_at: faker.date.between(created, now),
+    updated_at: faker.date.between({ from: created, to: now }),
   })
 }
 
