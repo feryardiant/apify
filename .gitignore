@@ -13,7 +13,7 @@ Icon?
 
 # IDE Project Configurations
 # --------------------------
-.vscode
+# .vscode
 .vercel
 *.sublime-*
 *.suo
