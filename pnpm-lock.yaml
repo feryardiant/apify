@@ -27,7 +27,7 @@ devDependencies:
     version: 18.19.64
   '@types/tape':
     specifier: ^5.6.4
-    version: 5.6.4
+    version: 5.6.5
   tap-dot:
     specifier: ^2.0.0
     version: 2.0.0
@@ -201,16 +201,10 @@ packages:
       undici-types: 5.26.5
     dev: true
 
-  /@types/tape@5.6.4:
-    resolution: {integrity: sha512-EmL4fJpZyByNCkupLLcJhneqcnT+rQUG5fWKNCsZyBK1x7nUuDTwwEerc4biEMZgvSK2+FXr775aLeXhKXK4Yw==}
+  /@types/tape@5.6.5:
+    resolution: {integrity: sha512-/Eer3ugx8wLoJ4FFD2QzAO2RjuAys60WzvnVhOREHg+EGazbae9N095pLPGhDRErBkngl8YjZ1hApQ79UHraaQ==}
     dependencies:
-      '@types/node': 18.19.64
-      '@types/through': 0.0.33
-    dev: true
-
-  /@types/through@0.0.33:
-    resolution: {integrity: sha512-HsJ+z3QuETzP3cswwtzt2vEIiHBk/dCcHGhbmG5X3ecnwFD/lPrMpliGXxSCg03L9AhrdwA4Oz/qfspkDW+xGQ==}
-    dependencies:
+      '@ljharb/through': 2.3.13
       '@types/node': 18.19.64
     dev: true
 
