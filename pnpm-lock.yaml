@@ -27,7 +27,7 @@ devDependencies:
     version: 18.19.69
   '@types/tape':
     specifier: ^5.6.4
-    version: 5.6.5
+    version: 5.8.0
   tap-dot:
     specifier: ^2.0.0
     version: 2.0.0
@@ -201,11 +201,12 @@ packages:
       undici-types: 5.26.5
     dev: true
 
-  /@types/tape@5.6.5:
-    resolution: {integrity: sha512-/Eer3ugx8wLoJ4FFD2QzAO2RjuAys60WzvnVhOREHg+EGazbae9N095pLPGhDRErBkngl8YjZ1hApQ79UHraaQ==}
+  /@types/tape@5.8.0:
+    resolution: {integrity: sha512-UK1ChHa29Udnlcrv5MPjm6OvFFntZZyt+fXGsJ1CdvcYI8xfzxLJwGmELCe9xKrQJ6JD52QCSSZrirZFO9S+lQ==}
     dependencies:
       '@ljharb/through': 2.3.13
       '@types/node': 18.19.69
+      mock-property: 1.1.0
     dev: true
 
   /@vercel/build-utils@8.4.12:
